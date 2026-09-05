@@ -20,15 +20,38 @@
 ## 工作原理
 
 ```mermaid
-flowchart LR
-    A[command-code 官方 npm] -->|每 6h 检测新版本| B[catalog-sync CI]
-    B -->|sync-models 提取| C[models.json / _version.txt / manifest.json]
-    C -->|直推 main| D[本仓库 raw GitHub URL]
-    D -->|启动时 fetch 8s 超时| E[插件 config hook]
-    E -->|成功| F[写本地缓存]
-    E -->|失败| G[回退 bundled → 缓存]
-    F --> H[opencode 模型列表]
-    G --> H
+sequenceDiagram
+    autonumber
+    participant NPM as command-code 官方 npm
+    participant CI as catalog-sync CI
+    participant REPO as 本仓库 main
+    participant PLUGIN as 插件 config hook
+    participant CACHE as 本地缓存
+    participant OC as opencode 模型列表
+
+    rect rgb(235, 248, 255)
+    Note over NPM,REPO: 同步线 · 每 6 小时（后台）
+    NPM->>CI: 发布新版本 command-code@X
+    CI->>CI: 比对 _version.txt，版本不一致
+    CI->>CI: sync-models 提取模型
+    alt 提取成功且模型数达标
+        CI->>REPO: 直推 models.json（不经 PR）
+    else 提取失败 / 跌破保护线
+        CI->>REPO: 开 catalog-break issue，不推坏数据
+    end
+    end
+
+    rect rgb(255, 250, 235)
+    Note over PLUGIN,OC: 使用线 · 每次启动（用户可见）
+    PLUGIN->>REPO: fetch raw models.json（8s 超时）
+    alt 拉取成功
+        PLUGIN->>CACHE: 写入缓存
+    else 拉取失败
+        PLUGIN->>CACHE: 回退 bundled → 缓存
+    end
+    CACHE->>PLUGIN: 模型列表
+    PLUGIN->>OC: 注入 provider.commandcode.models
+    end
 ```
 
 三处关键设计：
