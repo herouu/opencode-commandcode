@@ -49,12 +49,6 @@ export type BuildManifestInput = {
   costCatalogError?: string | null;
 };
 
-export function bumpPatch(version: string): string {
-  const parts = version.split(".");
-  const patch = Number(parts[2] ?? "0");
-  return `${parts[0] ?? "0"}.${parts[1] ?? "0"}.${patch + 1}`;
-}
-
 export function meetsModelCountFloor(modelCount: number, lastSuccessful: number | null): boolean {
   const floor = Math.max(20, Math.floor((lastSuccessful ?? 20) * 0.5));
   // ponytail: when there is no prior catalog, lastSuccessful is null and the floor is 20
@@ -137,11 +131,4 @@ export function countCostSources(input: {
     else sources.unmatched++;
   }
   return sources;
-}
-
-export function bumpPackageVersionField(pkgJson: string): { json: string; version: string } {
-  const pkg = JSON.parse(pkgJson) as { version: string };
-  const version = bumpPatch(pkg.version);
-  const json = pkgJson.replace(/("version"\s*:\s*")([^"]+)(")/, `$1${version}$3`);
-  return { json, version };
 }

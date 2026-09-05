@@ -8,12 +8,10 @@ import {
   meetsModelCountFloor,
   type CatalogManifest,
 } from "../src/manifest.js";
-import { decideCatalogSync } from "../src/publish-policy.js";
-import { npmLatestVersion, npmPackageVersions } from "./npm-registry.js";
+import { npmLatestVersion } from "./npm-registry.js";
 
 const ROOT = join(import.meta.dir, "..");
 const CATALOG_FILES = ["models.json", "_version.txt", "manifest.json"];
-const CATALOG_BRANCH = "chore/catalog-sync";
 
 function readJson<T>(path: string): T | null {
   if (!existsSync(path)) return null;
@@ -66,11 +64,9 @@ function openOrUpdateCatalogBreak(input: { commandCodeVersion: string; error: st
   });
 }
 
-function queuePrAutoMerge(): void {
-  execSync("gh pr merge --auto --squash --delete-branch", { cwd: ROOT, stdio: "inherit" });
-}
-
-function openCatalogPr(commandCodeVersion: string): void {
+// 路线 A（gfwlist 式直推）：不开 PR、不依赖 semantic-release 发版。
+// catalog 文件直接提交到当前分支（main）并推送，插件运行时从 raw URL 拉取即生效。
+function pushToMain(commandCodeVersion: string): void {
   const status = git(`status --porcelain -- ${CATALOG_FILES.join(" ")}`);
   if (!status) {
     console.log("catalog files unchanged");
@@ -78,48 +74,32 @@ function openCatalogPr(commandCodeVersion: string): void {
   }
   git('config user.name "github-actions[bot]"');
   git('config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
-  execSync(`git checkout -B ${CATALOG_BRANCH}`, { cwd: ROOT, stdio: "inherit" });
   execSync(`git add ${CATALOG_FILES.join(" ")}`, { cwd: ROOT, stdio: "inherit" });
   execSync(
-    `git commit -m ${JSON.stringify(`fix(catalog): sync command-code@${commandCodeVersion}`)}`,
+    `git commit -m ${JSON.stringify(`models.json edited ${new Date().toUTCString()} (command-code@${commandCodeVersion})`)}`,
     { cwd: ROOT, stdio: "inherit" },
   );
-  execSync(`git push -u origin ${CATALOG_BRANCH} --force`, { cwd: ROOT, stdio: "inherit" });
-  const existing = execSync(`gh pr list --head ${CATALOG_BRANCH} --base main --json number`, {
-    cwd: ROOT,
-    encoding: "utf-8",
-  });
-  const prs = JSON.parse(existing) as Array<{ number: number }>;
-  if (prs.length > 0) {
-    console.log(`updated catalog PR #${prs[0].number}`);
-    queuePrAutoMerge();
-    return;
-  }
-  execSync(
-    `gh pr create --base main --head ${CATALOG_BRANCH} --title ${JSON.stringify(`fix(catalog): sync command-code@${commandCodeVersion}`)} --body ${JSON.stringify(`Automated catalog refresh from command-code@${commandCodeVersion}. Auto-merges when CI is green; semantic-release publishes the patch.`)}`,
-    { cwd: ROOT, stdio: "inherit" },
-  );
-  queuePrAutoMerge();
+  execSync(`git push origin HEAD:main`, { cwd: ROOT, stdio: "inherit" });
+  console.log(`pushed catalog sync for command-code@${commandCodeVersion} to main`);
 }
 
 async function main(): Promise<void> {
   const force = process.env.FORCE === "true" || process.argv.includes("--force");
-  const pkgPath = join(ROOT, "package.json");
-  const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { name: string; version: string };
   const latestCc = await npmLatestVersion("command-code");
-  const published = await npmPackageVersions(pkg.name);
-  const decision = decideCatalogSync({
-    force,
-    latestCommandCodeVersion: latestCc,
-    bundledCommandCodeVersion: bundledCommandCodeVersion(),
-    pluginVersion: pkg.version,
-    publishedPluginVersions: published,
-  });
 
-  console.log(JSON.stringify({ latestCc, pluginVersion: pkg.version, decision }));
+  // 路线 A：不依赖 npm 发布状态。仅当上游 command-code 版本变化（或 force）才重新提取。
+  const shouldExtract = force || latestCc !== bundledCommandCodeVersion();
 
-  if (!decision.extract) {
-    console.log("no catalog extract (release job owns unpublished plugin versions)");
+  console.log(
+    JSON.stringify({
+      latestCc,
+      bundledCommandCodeVersion: bundledCommandCodeVersion(),
+      shouldExtract,
+    }),
+  );
+
+  if (!shouldExtract) {
+    console.log("catalog up to date, no extract needed");
     return;
   }
 
@@ -164,7 +144,9 @@ async function main(): Promise<void> {
   }
 
   if (process.env.CI === "true") {
-    openCatalogPr(bundledCommandCodeVersion() ?? latestCc);
+    pushToMain(bundledCommandCodeVersion() ?? latestCc);
+  } else {
+    console.log("catalog updated locally; set CI=true to push to main");
   }
 }
 

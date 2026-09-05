@@ -4,7 +4,6 @@ import { tmpdir } from "os";
 import { join } from "path";
 import {
   buildManifest,
-  bumpPatch,
   countCostSources,
   meetsModelCountFloor,
   writeManifest,
@@ -19,13 +18,6 @@ const sources = (partial: Partial<CostSources> = {}): CostSources => ({
   fallback: 0,
   unmatched: 0,
   ...partial,
-});
-
-describe("bumpPatch", () => {
-  test("increments the patch segment", () => {
-    expect(bumpPatch("0.5.0")).toBe("0.5.1");
-    expect(bumpPatch("1.2.9")).toBe("1.2.10");
-  });
 });
 
 describe("meetsModelCountFloor", () => {

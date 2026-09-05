@@ -13,16 +13,13 @@ on:
 permissions:
   contents: write
   issues: write
-  pull-requests: write
 
 jobs:
   sync:
-    name: catalog-pr
+    name: catalog-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.RELEASE_SYNC_TOKEN || secrets.CATALOG_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -33,17 +30,17 @@ jobs:
 
       - name: Ensure automation labels
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_SYNC_TOKEN || secrets.CATALOG_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh label create catalog-break --force --color B60205 \
             --description "Catalog model extraction failed in CI" || true
-          gh label create automation --force --color 0E8A16 \
-            --description "Automated bot activity" || true
 
-      - name: Open catalog PR
+      # 路线 A（gfwlist 式）：检测到上游 command-code 新版本即重新提取 models.json，
+      # 并直接提交推送到 main（不经 PR、不触发 npm 发版）。提交信息仿照 gfwlist 的
+      # "models.json edited <UTC time>" 风格。插件运行时从 raw URL 拉取即生效。
+      - name: Sync catalog and push to main
         env:
           CI: "true"
           FORCE: ${{ inputs.force }}
-          GH_TOKEN: ${{ secrets.RELEASE_SYNC_TOKEN || secrets.CATALOG_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.RELEASE_SYNC_TOKEN || secrets.CATALOG_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run scripts/catalog-sync-ci.ts

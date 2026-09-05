@@ -18,15 +18,15 @@
     "opencode-provider",
     "qwen"
   ],
-  "homepage": "https://github.com/BrainerVirus/opencode-commandcode#readme",
+  "homepage": "https://github.com/herouu/opencode-commandcode#readme",
   "bugs": {
-    "url": "https://github.com/BrainerVirus/opencode-commandcode/issues"
+    "url": "https://github.com/herouu/opencode-commandcode/issues"
   },
   "license": "MIT",
   "author": "Brent Weatherall",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BrainerVirus/opencode-commandcode.git"
+    "url": "git+https://github.com/herouu/opencode-commandcode.git"
   },
   "files": [
     "index.ts",
@@ -35,7 +35,6 @@
     "manifest.json",
     "_version.txt",
     "README.md",
-    "CHANGELOG.md",
     "src/"
   ],
   "type": "module",
@@ -49,36 +48,24 @@
       "import": "./plugin.ts"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "lint": "oxlint --deny-warnings src scripts plugin.ts index.ts tests",
     "lint:fix": "oxlint --fix src scripts plugin.ts index.ts tests",
-    "format": "oxfmt src scripts plugin.ts index.ts tests package.json tsconfig.json release.config.cjs",
-    "format:check": "oxfmt --check src scripts plugin.ts index.ts tests package.json tsconfig.json release.config.cjs",
+    "format": "oxfmt src scripts plugin.ts index.ts tests package.json tsconfig.json",
+    "format:check": "oxfmt --check src scripts plugin.ts index.ts tests package.json tsconfig.json",
     "check": "bun run lint && bun run format:check && bun test tests/unit/ && bun run typecheck",
     "test": "bun test tests/unit/",
     "test:integration": "bun test tests/integration/",
     "test:all": "bun test",
     "typecheck": "tsc --noEmit",
-    "verify:release-candidate": "bun run scripts/verify-release-candidate.ts",
-    "generate-readme": "bun run scripts/generate-readme.ts",
     "sync": "bun run scripts/sync-models.ts",
     "sync:global": "bun run scripts/sync-models.ts --update-global",
     "catalog:ci": "bun run scripts/catalog-sync-ci.ts"
   },
   "devDependencies": {
-    "@semantic-release/exec": "7.1.0",
-    "@semantic-release/github": "12.0.9",
-    "@semantic-release/npm": "13.1.5",
-    "@semantic-release/release-notes-generator": "14.1.1",
-    "@types/bun": "1.4.0",
     "@types/node": "^25.9.1",
-    "ai": "6.0.191",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
-    "semantic-release": "25.0.9",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {

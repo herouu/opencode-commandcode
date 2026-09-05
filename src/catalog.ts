@@ -2,7 +2,6 @@ import { createRequire } from "module";
 import { execSync } from "child_process";
 import { existsSync, readFileSync, statSync } from "fs";
 import { dirname, join, resolve as resolvePath } from "path";
-import { fileURLToPath } from "url";
 
 export const NPM_PACKAGE = "command-code";
 
@@ -257,18 +256,6 @@ export function extractBestProviderEnum(
   }
 
   return fallback;
-}
-
-export function extractWt(source: string): Record<string, string> {
-  const best = extractBestProviderEnum(source);
-  if (!best) throw new Error(`Anchor not found: ANTHROPIC:"anthropic"`);
-  return best.value;
-}
-
-export function getWtVarName(source: string): string {
-  const best = extractBestProviderEnum(source);
-  if (!best) throw new Error("Could not find Wt enum");
-  return best.name;
 }
 
 /** Collect nearby `name="value"` bindings and simple aliases (`tI=Qx`). */
@@ -779,9 +766,4 @@ export function generateOpencodeModels(entries: ModelEntry[]): Record<string, un
     models[key] = model;
   }
   return models;
-}
-
-// Keep import.meta.url resolution available for callers that need package-relative paths
-export function catalogModuleDir(): string {
-  return dirname(fileURLToPath(import.meta.url));
 }

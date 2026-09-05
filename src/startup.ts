@@ -6,7 +6,7 @@ import type { ModelEntry } from "./catalog.js";
 export type { ModelEntry } from "./catalog.js";
 
 export type StartupSummary = {
-  catalogSource: "bundled" | "cache" | "opt-in-local";
+  catalogSource: "bundled" | "cache" | "opt-in-local" | "remote";
   commandCodeVersion: string | null;
   modelCount: number;
   reasoningModelCount: number;

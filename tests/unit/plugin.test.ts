@@ -27,6 +27,7 @@ type PluginModule = { default: () => Promise<PluginResult> };
 let pluginFn: PluginModule["default"];
 let testStateDir: string;
 let prevStateDir: string | undefined;
+let prevCatalogUrl: string | undefined;
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const modelsPath = join(repoRoot, "models.json");
@@ -56,6 +57,11 @@ beforeAll(async () => {
   testStateDir = mkdtempSync(join(tmpdir(), "cc-plugin-state-"));
   prevStateDir = process.env.COMMANDCODE_PROVIDER_STATE_DIR;
   process.env.COMMANDCODE_PROVIDER_STATE_DIR = testStateDir;
+  // These tests exercise the bundled/cache fallback path (models.json missing or
+  // corrupted). Disable the runtime remote fetch so a live network (CI) cannot
+  // supply a "remote" catalog and change which source is under test.
+  prevCatalogUrl = process.env.COMMANDCODE_CATALOG_URL;
+  process.env.COMMANDCODE_CATALOG_URL = "disabled";
   const mod = await import("../../plugin.ts");
   pluginFn = mod.default;
 });
@@ -63,6 +69,8 @@ beforeAll(async () => {
 afterAll(() => {
   if (prevStateDir === undefined) delete process.env.COMMANDCODE_PROVIDER_STATE_DIR;
   else process.env.COMMANDCODE_PROVIDER_STATE_DIR = prevStateDir;
+  if (prevCatalogUrl === undefined) delete process.env.COMMANDCODE_CATALOG_URL;
+  else process.env.COMMANDCODE_CATALOG_URL = prevCatalogUrl;
   rmSync(testStateDir, { recursive: true, force: true });
   restoreBundledCatalog();
 });

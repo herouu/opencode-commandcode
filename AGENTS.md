@@ -1,35 +1,32 @@
 # AGENTS.md
 
-OpenCode provider plugin (`@brainervirus/opencode-commandcode`). Ships a **bundled** model catalog (`models.json`) extracted from the minified `command-code` npm CLI. CI does the extracting — never hand-edit `models.json`, `manifest.json`, or `_version.txt`.
+herouu 自用 fork of `@brainervirus/opencode-commandcode`。**不发布 npm**。运行时模型目录通过远程拉取保持最新，全部自动化为 GitHub Actions，改动在 `main` 直接进行并 push。
 
-Layout: `src/` = runtime plugin + catalog engine (product, release-gated). `scripts/` = CI tooling (not published, not release-gated). `tests/unit/` = the only suite `bun run check` runs.
+## 运行时目录加载（`plugin.ts`）
 
-## Commands
+- 每次启动优先从 fork raw GitHub URL 拉取 `models.json`（默认 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`）。
+- 拉取失败回退 bundled `models.json` → 本地缓存 `catalog-cache.json`。
+- 可用环境变量 `COMMANDCODE_CATALOG_URL`（或配置 `catalogUrl`）覆盖远程 URL；设为 `disabled` 关闭远程拉取。
+- `src/startup.ts` 的 `StartupSummary.catalogSource` 含 `"remote"`。
 
-- `bun run check` — the CI gate: `oxlint --deny-warnings` + `oxfmt --check` + `bun test tests/unit/` + `tsc --noEmit`. Run before every PR.
-- Single file: `bun test tests/unit/catalog.test.ts`
-- Refresh catalog locally (writes `models.json`, `_version.txt`, `manifest.json`): `bun run sync -- --remote`
+## 命令
 
-## Release rules — read before committing
+- `bun run check` — CI gate：`oxlint --deny-warnings` + `oxfmt --check` + `bun test tests/unit/` + `tsc --noEmit`。
+- 单文件测试：`bun test tests/unit/catalog.test.ts`
+- 本地刷新目录（写 `models.json`、`_version.txt`、`manifest.json`）：`bun run sync -- --remote`
 
-On 2026-09-02 this repo published **42 accidental npm versions** (0.7.5→0.7.46) from an infinite loop. The rules below exist to prevent that. Do not relax them.
+## CI
 
-- Releases are path-gated (`scripts/analyze-release-scope.ts`): a commit counts only if it touches a product path — `plugin.ts`, `index.ts`, `models.json`, `manifest.json`, `_version.txt`, or `src/`. CI/docs/tests/scripts-only merges never release.
-- Only **`fix|feat|perf`** commit subjects can cut a release. **`chore` never releases — not even `chore(scope)`.** The post-release automation commits `chore(release): sync manifests to vX` touching `package.json` + `manifest.json` (both product paths): making any `chore` releasable turns each release into the trigger for the next one — release → sync PR → merge → release → …
-- The intended release path for catalog updates is the automation's `fix(catalog): sync command-code@X` commit (patch). Do not rename it to `chore(catalog)`.
-- `package.json` / `manifest.json` version fields are written by automation only; don't bump them in feature PRs.
+- `catalog-sync.yml`：每 6h + manual dispatch。检测上游 `command-code` 新版本，提取模型目录并**直推 `main`**（不经 PR）。commit message 格式 `models.json edited <UTC> (...)`。提取失败则开/更新 catalog-break issue（标签 `catalog-break`、`automation` 必须存在）。
+- `ci.yml`：4 个 check —— test / typecheck / lint / format。
 
-## Catalog extraction (`src/catalog.ts`) — fragile by design
+## 目录提取（`src/catalog.ts`）—— fragile by design
 
-- It slices balanced `{…}` spans around the anchor `SONNET_4_6:{id:"claude-sonnet-4-6"` and evals them with string bindings collected from the 12k chars before the anchor (`extractStringBindings`).
-- Minified identifier names are **not stable** across `command-code` releases. 1.40.x introduced `$`-prefixed vars (`$R="vercel-ai-gateway"`); `\b` regex boundaries never fire before `$` (not a word char) — use `(?<![A-Za-z0-9_$])` lookbehind instead. Same for alias resolution.
-- Symptom of a new bundle shape: `Could not evaluate model catalog` — every candidate span threw and errors were swallowed. To debug: download the tarball (`https://registry.npmjs.org/command-code/-/command-code-<v>.tgz`, bundle is `dist/cli.mjs`), eval candidates manually with the same context, and surface the real ReferenceError (usually a missing binding, e.g. `$R is not defined`).
-- Every extraction fix ships with a regression test in `tests/unit/catalog.test.ts` whose fixture mirrors the new minified shape. `isModelCatalog` requires ≥2 model entries — single-model fixtures fail.
+- 围绕锚点 `SONNET_4_6:{id:"claude-sonnet-4-6"` 切取平衡 `{…}` 区间，用锚点前 12k 字符收集的字符串绑定（`extractStringBindings`）eval。
+- 压缩后的标识符名在 `command-code` 各版本间**不稳定**。1.40.x 引入 `$` 前缀变量（`$R="vercel-ai-gateway"`）；`\b` 在 `$`（非词字符）前永不命中——用 `(?<![A-Za-z0-9_$])` lookbehind。别名解析同理。
+- 新 bundle 形态的症状：`Could not evaluate model catalog`——每个候选区间都抛错且被吞。调试：下载 tarball（`https://registry.npmjs.org/command-code/-/command-code-<v>.tgz`，bundle 是 `dist/cli.mjs`），用相同上下文手动 eval 候选区间，找出真实 ReferenceError（通常是缺失绑定，如 `$R is not defined`）。
+- 每次修复必须带 `tests/unit/catalog.test.ts` 回归测试，fixture 镜像新压缩形态。`isModelCatalog` 要求 ≥2 个模型条目——单模型 fixture 会失败。
 
-## CI automation
+## ⚠️ 警示
 
-- `catalog-sync.yml`: every 6h + manual dispatch. Extracts `command-code@latest`, opens a `fix(catalog)` PR (branch `chore/catalog-sync`) that auto-merges when the five `check *` jobs pass. On extraction failure it opens/updates a **catalog-break issue** — labels `catalog-break` and `automation` must exist on the repo (recreate with `gh label create` if missing).
-- `release.yml`: semantic-release on every push to `main` (npm publish + tag + GitHub Release), then opens the `chore(release): sync manifests` PR which also auto-merges.
-- `main` is protected (5 required checks). Never push to `main` — open a PR and let auto-merge handle it.
-- `workflow_dispatch` always runs a workflow from **`main`**, never a PR head. Dispatching does not test your branch.
-- Secrets: `NPMJS` (npm **Automation** token, mapped to `NPM_TOKEN`/`NODE_AUTH_TOKEN` — a login token fails with `EOTP`), `RELEASE_SYNC_TOKEN` (PAT; PRs opened with `GITHUB_TOKEN` do not trigger CI runs on their branch).
+`models.json`、`manifest.json`、`_version.txt` 由 CI 自动生成（`catalog-sync.yml` 直推 main）。**勿手改**。提交前注意别把它们和手写改动混在一起。
