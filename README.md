@@ -24,7 +24,7 @@
 
 ## 演示
 
-[![asciicast](https://asciinema.org/a/1264752.svg)](https://asciinema.org/a/1264752)
+[![asciicast](https://asciinema.org/a/1264754.svg)](https://asciinema.org/a/1264754)
 
 安装插件 → 重启 opencode → `/models` 中选择 Command Code 模型 → 直接对话。
 
