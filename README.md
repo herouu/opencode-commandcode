@@ -50,7 +50,18 @@ npm install @herouucn/opencode-commandcode
 bun add @herouucn/opencode-commandcode
 ```
 
-### 方式二：本地路径（开发用）
+### 方式二：一键脚本（推荐）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/herouu/opencode-commandcode/main/install.sh | bash
+```
+
+脚本自动完成：
+1. 检查 opencode 是否已安装
+2. 创建 `~/.config/opencode/opencode.json`（如已存在则合并）
+3. 追加 plugin 和 provider.commandcode 配置
+
+### 方式三：本地路径（开发用）
 
 ```bash
 git clone https://github.com/herouu/opencode-commandcode.git
