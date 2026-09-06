@@ -48,6 +48,9 @@
       "import": "./plugin.ts"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "lint": "oxlint --deny-warnings src scripts plugin.ts index.ts tests",
     "lint:fix": "oxlint --fix src scripts plugin.ts index.ts tests",
@@ -67,9 +70,6 @@
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
     "typescript": "^6.0.3"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "peerDependencies": {
     "ai": ">=6.0.0"
