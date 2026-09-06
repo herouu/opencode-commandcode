@@ -1,8 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "commandcode/deepseek-v4-flash",
-  "small_model": "commandcode/deepseek-v4-flash",
-  "plugin": ["@brainervirus/opencode-commandcode/server"],
   "provider": {
     "commandcode": {
       "npm": "@ai-sdk/openai-compatible",
