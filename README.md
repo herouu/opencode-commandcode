@@ -22,6 +22,12 @@
 | 目录自同步 | CI 每 6 小时检测上游 `command-code` 新版本并直推 `main` |
 | 安全发布 | 基于 GitHub OIDC Trusted Publishing 发布 npm，无需 long-lived token |
 
+## 演示
+
+[![asciinema 演示](https://asciinema.org/a/1264752.svg)](https://asciinema.org/a/1264752)
+
+安装插件 → 重启 opencode → `/models` 中选择 Command Code 模型 → 直接对话。
+
 ## 安装
 
 安装插件：
