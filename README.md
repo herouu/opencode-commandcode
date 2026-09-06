@@ -24,7 +24,9 @@
 
 ## 演示
 
-[![asciinema 演示](https://asciinema.org/a/1264752.svg)](https://asciinema.org/a/1264752?speed=2&idleTimeLimit=2)
+<script src="https://asciinema.org/a/1264752.js" id="asciicast-1264752" async data-speed="2" data-idle-time-limit="2"></script>
+
+> GitHub 渲染 README 时不支持 `<script>` 嵌入；如需在支持 HTML 的站点（如文档站）使用，直接复制上方代码即可。
 
 安装插件 → 重启 opencode → `/models` 中选择 Command Code 模型 → 直接对话。
 
