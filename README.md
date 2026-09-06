@@ -68,9 +68,9 @@ opencode plugin @herouucn/opencode-commandcode
 
 opencode 自动完成：
 1. 安装 npm 包到缓存目录
-2. 更新 `~/.config/opencode/opencode.json`，追加 plugin 和 provider 配置
+2. 更新 `~/.config/opencode/opencode.json`，追加 plugin 声明
 
-重启 opencode 即可使用。
+provider 配置（`npm`、`baseURL`、模型列表）由插件启动时自动注入，无需手写。重启 opencode 即可使用。
 
 ### 方式二：npm 包
 
@@ -86,19 +86,11 @@ bun add @herouucn/opencode-commandcode
 // opencode.json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@herouucn/opencode-commandcode"],
-  "provider": {
-    "commandcode": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "commandcode",
-      "env": ["COMMANDCODE_API_KEY"],
-      "options": {
-        "baseURL": "https://api.commandcode.ai/provider/v1/"
-      }
-    }
-  }
+  "plugin": ["@herouucn/opencode-commandcode"]
 }
 ```
+
+> `provider.commandcode` 块可省略——插件启动时会自动注入 `npm: "@ai-sdk/openai-compatible"`、`baseURL`、`COMMANDCODE_API_KEY` env 和模型列表。如需覆盖默认行为（例如指向代理网关），可显式书写，插件不会覆盖已存在的配置：
 
 ### 方式三：本地路径（开发用）
 
@@ -236,6 +228,16 @@ CI 一览：
 **模型列表不更新？**
 先确认能访问 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`；再查本机状态 `~/.local/state/opencode/commandcode-provider/startup.json` 里的 `catalogSource` 字段（应为 `remote`）。
 
+**升级插件后模型列表还是旧的 / `opencode models` 崩溃？**
+opencode 将插件缓存于 `~/.cache/opencode/packages/@herouucn/`，日常升级 tag 后缓存放行。若改动未生效或行为异常，删除该目录后重跑 `opencode models` 强制重拉最新版：
+
+```bash
+Remove-Item -Recurse -Force "$HOME\.cache\opencode\packages\@herouucn"
+```
+
+**`opencode models` 报 `undefined is not an object (evaluating '$.models')`？**
+确认已升级到 **v0.1.7 及以上**。v0.1.6 及更早版本在全局配置 `provider: {}`（空对象）时，config hook 会跳过 commandcode 注入，导致 opencode 内部崩溃。v0.1.7 起改用 `??=` 确保 commandcode 块始终存在，`provider` 字段缺省或为空均正常。
+
 **离线环境能用吗？**
 能。首次成功后模型已写入本地缓存；离线启动时走 `bundled → cache` 回退链，模型不缺失。
 
@@ -244,6 +246,8 @@ CI 提取失败或模型数异常时自动创建的告警 issue，表示最近�
 
 **为什么 Trusted Publishing 而不是 long-lived token？**
 Trusted Publishing 使用 OIDC 短期 token，每次发布自动轮换，无需手动管理 token，无泄露风险。
+
+> 手动配置 `provider.commandcode.options.baseURL` 不会被插件覆盖；但请保留 `npm: "@ai-sdk/openai-compatible"` 或明确指定其他兼容 SDK，否则 opencode 无法解析 provider。
 
 ## 致谢
 
