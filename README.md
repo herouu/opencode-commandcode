@@ -20,6 +20,43 @@
 | 目录自同步 | CI 每 6 小时检测上游新版本并直推 `main` |
 | 安全发布 | 基于 GitHub OIDC Trusted Publishing，无需 long-lived token |
 
+## 演示
+
+安装后运行 opencode，输入 `/models` 即可看到 Command Code 提供的 70+ 模型：
+
+```
+opencode
+> /models
+
+commandcode/claude-fable-5
+commandcode/claude-fable-5-1
+commandcode/claude-haiku-4-5-20251001
+commandcode/claude-opus-4-7
+commandcode/claude-opus-4-8
+commandcode/claude-opus-5
+commandcode/claude-sonnet-4-6
+commandcode/claude-sonnet-5
+commandcode/deepseek-v4-flash
+commandcode/deepseek-v4-flash-fast
+commandcode/deepseek-v4-pro
+commandcode/gemini-3.5-flash
+commandcode/gemini-3.6-flash
+commandcode/gemini-3.7-flash
+commandcode/gemini-3.8-flash
+commandcode/gpt-5.4
+commandcode/gpt-5.4-mini
+commandcode/gpt-5.5
+commandcode/gpt-5.6-luna
+commandcode/gpt-5.6-sol
+commandcode/gpt-5.6-terra
+commandcode/qwen3.7-max
+commandcode/qwen3.7-plus
+commandcode/qwen3.8-max
+... 共 70+ 模型
+```
+
+选择模型后直接对话，无需额外配置。
+
 ## 安装
 
 ### 方式一：opencode plugin（推荐）
