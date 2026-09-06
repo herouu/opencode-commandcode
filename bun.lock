@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "commandcode-go-opencode-provider",
+      "name": "@herouucn/opencode-commandcode",
       "devDependencies": {
         "@types/node": "^25.9.1",
         "oxfmt": "0.63.0",

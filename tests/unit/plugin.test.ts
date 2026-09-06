@@ -120,7 +120,7 @@ test("config hook registers provider with npm and models", async () => {
   await plugin.config(config);
 
   const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
-  expect(cc.npm).toBe("commandcode-go-opencode-provider");
+  expect(cc.npm).toBe("@ai-sdk/openai-compatible");
   expect(cc.name).toBe("Command Code");
   expect(cc.env).toEqual(["COMMANDCODE_API_KEY"]);
   expect(cc.models).toBeDefined();
@@ -137,6 +137,31 @@ test("config hook does not overwrite existing npm field", async () => {
 
   const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
   expect(cc.npm).toBe("custom-package");
+});
+
+test("config hook injects default baseURL when options missing", async () => {
+  const plugin = await pluginFn();
+  const config: Record<string, unknown> = {
+    provider: { commandcode: {} },
+  };
+  await plugin.config(config);
+
+  const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
+  const options = cc.options as Record<string, unknown>;
+  expect(options).toBeDefined();
+  expect(options.baseURL).toBe("https://api.commandcode.ai/provider/v1/");
+});
+
+test("config hook does not overwrite existing baseURL", async () => {
+  const plugin = await pluginFn();
+  const config: Record<string, unknown> = {
+    provider: { commandcode: { options: { baseURL: "https://custom.example.com" } } },
+  };
+  await plugin.config(config);
+
+  const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
+  const options = cc.options as Record<string, unknown>;
+  expect(options.baseURL).toBe("https://custom.example.com");
 });
 
 test("config hook does not overwrite existing models", async () => {
@@ -159,7 +184,7 @@ test("config hook creates provider block if missing", async () => {
   expect(config.provider).toBeDefined();
   const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
   expect(cc).toBeDefined();
-  expect(cc.npm).toBe("commandcode-go-opencode-provider");
+  expect(cc.npm).toBe("@ai-sdk/openai-compatible");
 });
 
 test("startup summary uses bundled manifest version and status", async () => {
@@ -236,7 +261,7 @@ test("CA-04: registers npm/env with empty models when bundled and cache miss", a
     await plugin.config(config);
 
     const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
-    expect(cc.npm).toBe("commandcode-go-opencode-provider");
+    expect(cc.npm).toBe("@ai-sdk/openai-compatible");
     expect(cc.name).toBe("Command Code");
     expect(cc.env).toEqual(["COMMANDCODE_API_KEY"]);
     expect(cc.models).toEqual({});

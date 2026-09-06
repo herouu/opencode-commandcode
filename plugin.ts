@@ -34,13 +34,13 @@ interface PluginFileConfig {
 const DEFAULT_REMOTE_CATALOG_URL =
   "https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json";
 
+// 默认 OpenAI 兼容端点：与 @ai-sdk/openai-compatible 搭配，等价于 README 手动配置推荐值。
+const DEFAULT_BASE_URL = "https://api.commandcode.ai/provider/v1/";
+
 function loadPluginConfig(): PluginFileConfig {
   const dir = join(homedir(), ".config", "opencode");
-  const configPath = [
-    join(dir, "opencode-commandcode.json"),
-    join(dir, "commandcode-go-opencode-provider.json"),
-  ].find((p) => existsSync(p));
-  if (!configPath) return {};
+  const configPath = join(dir, "opencode-commandcode.json");
+  if (!existsSync(configPath)) return {};
   try {
     return JSON.parse(readFileSync(configPath, "utf-8"));
   } catch {
@@ -123,9 +123,12 @@ export default async function commandcodePlugin() {
         process.env.COMMANDCODE_PACKAGE_PATH?.trim() ||
         "";
 
-      if (!cc.npm) cc.npm = "commandcode-go-opencode-provider";
+      if (!cc.npm) cc.npm = "@ai-sdk/openai-compatible";
       if (!cc.name) cc.name = "Command Code";
       if (!cc.env) cc.env = ["COMMANDCODE_API_KEY"];
+      const options = (cc.options as Record<string, unknown> | undefined) ?? {};
+      cc.options = options;
+      if (typeof options.baseURL !== "string") options.baseURL = DEFAULT_BASE_URL;
 
       if (cc.models) return;
 
