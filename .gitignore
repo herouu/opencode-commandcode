@@ -4,6 +4,7 @@ dist/
 .DS_Store
 opencode.local.json
 .commandcode/
+.playwright-mcp/
 
 # workit: SDD working state (never commit)
 docs/*/sdd/
