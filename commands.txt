@@ -1,0 +1,4 @@
+# 演示命令列表
+# 每行一条命令，# 开头为注释
+opencode plugin @herouucn/opencode-commandcode
+opencode models 2>&1 | findstr "commandcode/" | findstr /n "^" | findstr "^[1-9]:" | findstr /c:"1:" /c:"2:" /c:"3:" /c:"4:" /c:"5:" /c:"6:" /c:"7:" /c:"8:" /c:"9:" /c:"10:" /c:"11:" /c:"12:" /c:"13:" /c:"14:" /c:"15:"

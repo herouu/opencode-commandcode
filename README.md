@@ -22,12 +22,13 @@
 
 ## 演示
 
+安装插件并查看模型列表：
+
+[![asciinema demo](https://asciinema.org/a/ePh5yVrpNatwEQKT.svg)](https://asciinema.org/a/ePh5yVrpNatwEQKT)
+
 安装后运行 opencode，输入 `/models` 即可看到 Command Code 提供的 70+ 模型：
 
 ```
-opencode
-> /models
-
 commandcode/claude-fable-5
 commandcode/claude-fable-5-1
 commandcode/claude-haiku-4-5-20251001
