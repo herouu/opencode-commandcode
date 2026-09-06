@@ -1,7 +1,11 @@
 # opencode-commandcode
 
 [![CI](https://img.shields.io/github/actions/workflow/status/herouu/opencode-commandcode/ci.yml?branch=main&label=CI)](https://github.com/herouu/opencode-commandcode/actions)
-[![npm](https://img.shields.io/npm/v/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
+[![npm version](https://img.shields.io/npm/v/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
+[![npm downloads/month](https://img.shields.io/npm/dm/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
+[![npm downloads/week](https://img.shields.io/npm/dw/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@herouucn/opencode-commandcode)](https://bundlephobia.com/package/@herouucn/opencode-commandcode)
+[![node version](https://img.shields.io/node/v/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Command Code](https://commandcode.ai) API provider for [opencode](https://opencode.ai) —— 通过一个 API key 使用 Claude、GPT、Gemini、DeepSeek、Qwen、Kimi、GLM、MiniMax、Step 等 70+ 模型。
