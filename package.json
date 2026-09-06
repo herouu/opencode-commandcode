@@ -1,6 +1,6 @@
 {
   "name": "@herouucn/opencode-commandcode",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Inject Command Code API provider into opencode — access Claude, GPT, Gemini, DeepSeek, Qwen, Kimi, GLM, MiniMax & Step via unified Command Code API. / 将 Command Code API provider 注入 opencode —— 通过统一的 Command Code API 使用 Claude、GPT、Gemini、DeepSeek、Qwen、Kimi、GLM、MiniMax 和 Step 模型。",
   "keywords": [
     "ai",
