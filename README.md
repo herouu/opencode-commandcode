@@ -22,7 +22,27 @@
 
 ## 安装
 
-### 方式一：npm 包（推荐）
+### 方式一：opencode plugin（推荐）
+
+```bash
+opencode plugin @herouucn/opencode-commandcode
+```
+
+opencode 自动完成：
+1. 安装 npm 包到缓存目录
+2. 更新 `~/.config/opencode/opencode.json`，追加 plugin 和 provider 配置
+
+重启 opencode 即可使用。
+
+### 方式二：npm 包
+
+```bash
+npm install @herouucn/opencode-commandcode
+# 或
+bun add @herouucn/opencode-commandcode
+```
+
+然后在 `opencode.json` 中声明：
 
 ```jsonc
 // opencode.json
@@ -41,25 +61,6 @@
   }
 }
 ```
-
-安装 npm 包：
-
-```bash
-npm install @herouucn/opencode-commandcode
-# 或
-bun add @herouucn/opencode-commandcode
-```
-
-### 方式二：一键脚本（推荐）
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/herouu/opencode-commandcode/main/install.sh | bash
-```
-
-脚本自动完成：
-1. 检查 opencode 是否已安装
-2. 创建 `~/.config/opencode/opencode.json`（如已存在则合并）
-3. 追加 plugin 和 provider.commandcode 配置
 
 ### 方式三：本地路径（开发用）
 
