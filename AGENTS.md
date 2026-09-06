@@ -1,10 +1,10 @@
 # AGENTS.md
 
-herouu 自用 fork of `@brainervirus/opencode-commandcode`。**不发布 npm**。运行时模型目录通过远程拉取保持最新，全部自动化为 GitHub Actions，改动在 `main` 直接进行并 push。
+herouu 独立维护的 `@herouucn/opencode-commandcode`（独立 fork，不再跟踪上游）。运行时模型目录通过远程拉取保持最新，全部自动化为 GitHub Actions，改动在 `main` 直接进行并 push。
 
 ## 运行时目录加载（`plugin.ts`）
 
-- 每次启动优先从 fork raw GitHub URL 拉取 `models.json`（默认 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`）。
+- 每次启动优先拉取 raw GitHub `models.json`（默认 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`）。
 - 拉取失败回退 bundled `models.json` → 本地缓存 `catalog-cache.json`。
 - 可用环境变量 `COMMANDCODE_CATALOG_URL`（或配置 `catalogUrl`）覆盖远程 URL；设为 `disabled` 关闭远程拉取。
 - `src/startup.ts` 的 `StartupSummary.catalogSource` 含 `"remote"`。

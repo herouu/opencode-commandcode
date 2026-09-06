@@ -5,105 +5,68 @@
 [![npm downloads/month](https://img.shields.io/npm/dm/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
 [![npm downloads/week](https://img.shields.io/npm/dw/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@herouucn/opencode-commandcode)](https://bundlephobia.com/package/@herouucn/opencode-commandcode)
-[![node version](https://img.shields.io/node/v/@herouucn/opencode-commandcode)](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-[Command Code](https://commandcode.ai) API provider for [opencode](https://opencode.ai) —— 通过一个 API key 使用 Claude、GPT、Gemini、DeepSeek、Qwen、Kimi、GLM、MiniMax、Step 等 70+ 模型。
+[Command Code](https://commandcode.ai)（统一多模型 API）的 [opencode](https://opencode.ai) provider。一个 key 即可在 opencode 中使用 Claude、GPT、Gemini、DeepSeek、Qwen、Kimi、GLM、MiniMax、Step 等 **70+ 模型**。
+
+安装即用：插件启动时自动注入 provider 配置、API key 读取与最新模型目录，无需任何手写配置；模型目录随上游发布自动同步，新模型即时可用。
 
 ## 特性
 
 | 特性 | 说明 |
 |---|---|
-| 单 key 多模型 | 通过 Command Code Provider API 聚合 70+ 模型 |
-| 运行时目录拉取 | 每次启动拉取远端 `models.json`，新模型即时生效 |
-| 离线兜底 | 拉取失败自动回退包内静态目录 → 本地缓存 |
-| 目录自同步 | CI 每 6 小时检测上游新版本并直推 `main` |
-| 安全发布 | 基于 GitHub OIDC Trusted Publishing，无需 long-lived token |
-
-## 演示
-
-安装插件并查看模型列表：
-
-[![asciinema demo](https://asciinema.org/a/ePh5yVrpNatwEQKT.svg)](https://asciinema.org/a/ePh5yVrpNatwEQKT)
-
-安装后运行 opencode，输入 `/models` 即可看到 Command Code 提供的 70+ 模型：
-
-```
-commandcode/claude-fable-5
-commandcode/claude-fable-5-1
-commandcode/claude-haiku-4-5-20251001
-commandcode/claude-opus-4-7
-commandcode/claude-opus-4-8
-commandcode/claude-opus-5
-commandcode/claude-sonnet-4-6
-commandcode/claude-sonnet-5
-commandcode/deepseek-v4-flash
-commandcode/deepseek-v4-flash-fast
-commandcode/deepseek-v4-pro
-commandcode/gemini-3.5-flash
-commandcode/gemini-3.6-flash
-commandcode/gemini-3.7-flash
-commandcode/gemini-3.8-flash
-commandcode/gpt-5.4
-commandcode/gpt-5.4-mini
-commandcode/gpt-5.5
-commandcode/gpt-5.6-luna
-commandcode/gpt-5.6-sol
-commandcode/gpt-5.6-terra
-commandcode/qwen3.7-max
-commandcode/qwen3.7-plus
-commandcode/qwen3.8-max
-... 共 70+ 模型
-```
-
-选择模型后直接对话，无需额外配置。
+| 零配置接入 | 安装后重启 opencode 即可使用，provider 配置与模型列表自动注入 |
+| 单 key 多模型 | 一个 Command Code API key 聚合 70+ 模型（Claude、GPT、Gemini、DeepSeek 等） |
+| 运行时目录同步 | 每次启动拉取最新 `models.json`，上游新模型即时生效 |
+| 离线兜底 | 拉取失败自动回退包内静态目录 → 本地缓存，模型不缺失 |
+| 目录自同步 | CI 每 6 小时检测上游 `command-code` 新版本并直推 `main` |
+| 安全发布 | 基于 GitHub OIDC Trusted Publishing 发布 npm，无需 long-lived token |
 
 ## 安装
 
-### 方式一：opencode plugin（推荐）
+安装插件：
 
 ```bash
 opencode plugin @herouucn/opencode-commandcode
 ```
 
-opencode 自动完成：
-1. 安装 npm 包到缓存目录
-2. 更新 `~/.config/opencode/opencode.json`，追加 plugin 声明
-
-provider 配置（`npm`、`baseURL`、模型列表）由插件启动时自动注入，无需手写。重启 opencode 即可使用。
-
-### 方式二：npm 包
-
-```bash
-npm install @herouucn/opencode-commandcode
-# 或
-bun add @herouucn/opencode-commandcode
-```
-
-然后在 `opencode.json` 中声明：
+或手动在 `opencode.json` 声明：
 
 ```jsonc
 // opencode.json
 {
-  "$schema": "https://opencode.ai/config.json",
   "plugin": ["@herouucn/opencode-commandcode"]
 }
 ```
 
-> `provider.commandcode` 块可省略——插件启动时会自动注入 `npm: "@ai-sdk/openai-compatible"`、`baseURL`、`COMMANDCODE_API_KEY` env 和模型列表。如需覆盖默认行为（例如指向代理网关），可显式书写，插件不会覆盖已存在的配置：
+本地开发可直接用路径：`"plugin": ["file:///absolute/path/to/opencode-commandcode"]`。
 
-### 方式三：本地路径（开发用）
+重启 opencode 后在 `/models` 中选择 Command Code 模型即可对话。
+
+## 配置
+
+API key 任选一种方式提供：
 
 ```bash
-git clone https://github.com/herouu/opencode-commandcode.git
+export COMMANDCODE_API_KEY="你的 key"     # 方式一：环境变量
 ```
 
-```jsonc
-// opencode.json
-{
-  "plugin": ["file:///absolute/path/to/opencode-commandcode"]
-}
+```bash
+opencode auth login --provider commandcode   # 方式二：交互式（/connect 搜 Command Code）
 ```
+
+方式三：`~/.commandcode/auth.json`（若已用官方 CLI 登录则自动复用）。
+
+> 插件自动注入 provider 配置（`npm`、baseURL、模型列表）且不覆盖已存在的手写配置。手动配置 `provider.commandcode.options.baseURL` 时请保留 `npm: "@ai-sdk/openai-compatible"` 或指定其他兼容 SDK，否则 opencode 无法解析 provider。
+
+### 目录源（可选覆盖）
+
+默认拉取本仓库 `main` 分支的 `models.json`，一般无需配置。可用环境变量 `COMMANDCODE_CATALOG_URL` 或配置 `catalogUrl` 覆盖：
+
+| 取值 | 行为 |
+|---|---|
+| URL | 每次启动拉取该地址（8s 超时），成功后写本地缓存 |
+| `disabled` | 关闭远程拉取，仅用包内静态 `models.json` |
 
 ## 工作原理
 
@@ -144,65 +107,18 @@ sequenceDiagram
 
 三处关键设计：
 
-1. **目录自更新**：`.github/workflows/catalog-sync.yml` 每 6 小时比对上游 `command-code` npm 版本与 `_version.txt`，有新版本则重新提取模型并**直接推送到 main**（commit 风格：`models.json edited <UTC time> (command-code@X)`）。
-2. **运行时解耦**：插件每次启动 fetch 本仓库 raw `models.json`，不再依赖 npm 发版。
+1. **目录自更新**：`.github/workflows/catalog-sync.yml` 每 6 小时比对上游 `command-code` npm 版本与 `_version.txt`，有新版本则重新提取模型并**直接推送到 main**。
+2. **运行时解耦**：插件每次启动 fetch 本仓库 raw `models.json`，模型更新不依赖 npm 发版。
 3. **质量护栏**：模型数跌破保护线时触发 `catalog-break` issue 并回滚，坏数据不落库。
-
-## 配置
-
-### API key（三选一）
-
-```bash
-export COMMANDCODE_API_KEY="你的 key"     # 方式一：环境变量
-```
-
-```bash
-opencode auth login --provider commandcode   # 方式二：交互式（/connect 搜 Command Code）
-```
-
-方式三：`~/.commandcode/auth.json`（若已用官方 CLI 登录则自动复用）。
-
-### 目录源（可选覆盖）
-
-默认拉取本仓库 `main` 分支的 `models.json`，一般无需配置。需要自定义时可覆盖：
-
-```bash
-export COMMANDCODE_CATALOG_URL="https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json"
-```
-
-或写入 `~/.config/opencode/opencode-commandcode.json`：
-
-```json
-{ "catalogUrl": "https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json" }
-```
-
-| 取值 | 行为 |
-|---|---|
-| URL | 每次启动拉取该地址（8s 超时），成功后写本地缓存 |
-| `disabled` | 关闭远程拉取，仅用包内静态 `models.json` |
-
-### 选择模型
-
-opencode 内运行 `/models` 选择（如 `commandcode/deepseek-v4-flash`）。
 
 ## 发布
 
-本仓库使用 **GitHub OIDC Trusted Publishing**，无需 long-lived npm token。
-
-**触发方式**：
+本仓库使用 **GitHub OIDC Trusted Publishing**，无需 long-lived npm token。push `v*` tag 触发 `release.yml`：先跑 check（lint + format + typecheck + unit test），通过后 `npm publish --provenance`。
 
 ```bash
-# 1. 修改版本号
 npm version patch   # 或 minor / major
-
-# 2. 推送 tag 触发发布
 git push origin main --tags
 ```
-
-发布流程：
-1. push `v*` tag → 触发 `release.yml`
-2. `check` job：lint + format + typecheck + unit test
-3. `publish` job：`npm publish --provenance`（OIDC 自动认证，生成 provenance 签名）
 
 **npm 包**：[@herouucn/opencode-commandcode](https://www.npmjs.com/package/@herouucn/opencode-commandcode)
 
@@ -211,7 +127,6 @@ git push origin main --tags
 ```bash
 bun install
 bun run check          # CI 门槛：oxlint + oxfmt --check + bun test + tsc
-
 bun run sync -- --remote   # 本地手动刷新 models.json / manifest.json / _version.txt
 ```
 
@@ -228,30 +143,22 @@ CI 一览：
 **模型列表不更新？**
 先确认能访问 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`；再查本机状态 `~/.local/state/opencode/commandcode-provider/startup.json` 里的 `catalogSource` 字段（应为 `remote`）。
 
-**升级插件后模型列表还是旧的 / `opencode models` 崩溃？**
-opencode 将插件缓存于 `~/.cache/opencode/packages/@herouucn/`，日常升级 tag 后缓存放行。若改动未生效或行为异常，删除该目录后重跑 `opencode models` 强制重拉最新版：
+**升级插件后模型列表还是旧的 / 行为异常？**
+opencode 将插件缓存于 `~/.cache/opencode/packages/@herouucn/`。删除该目录后重跑 `opencode models` 强制重拉最新版：
 
 ```bash
 Remove-Item -Recurse -Force "$HOME\.cache\opencode\packages\@herouucn"
 ```
 
 **`opencode models` 报 `undefined is not an object (evaluating '$.models')`？**
-确认已升级到 **v0.1.7 及以上**。v0.1.6 及更早版本在全局配置 `provider: {}`（空对象）时，config hook 会跳过 commandcode 注入，导致 opencode 内部崩溃。v0.1.7 起改用 `??=` 确保 commandcode 块始终存在，`provider` 字段缺省或为空均正常。
+确认已升级到 **v0.1.7 及以上**。v0.1.6 及更早版本在全局配置 `provider: {}`（空对象）时，config hook 会跳过 commandcode 注入，导致 opencode 内部崩溃。v0.1.7 起改用 `??=` 确保 commandcode 块始终存在。
 
 **离线环境能用吗？**
 能。首次成功后模型已写入本地缓存；离线启动时走 `bundled → cache` 回退链，模型不缺失。
 
-**catalog-break issue 是什么？**
-CI 提取失败或模型数异常时自动创建的告警 issue，表示最近一次同步被护栏拦截，正在使用上一份完好目录。
-
-**为什么 Trusted Publishing 而不是 long-lived token？**
-Trusted Publishing 使用 OIDC 短期 token，每次发布自动轮换，无需手动管理 token，无泄露风险。
-
-> 手动配置 `provider.commandcode.options.baseURL` 不会被插件覆盖；但请保留 `npm: "@ai-sdk/openai-compatible"` 或明确指定其他兼容 SDK，否则 opencode 无法解析 provider。
-
 ## 致谢
 
-源自 [BrainerVirus/opencode-commandcode](https://github.com/BrainerVirus/opencode-commandcode) v0.7.54（[Brent Weatherall](https://github.com/brent-weatherall) 原始实现）。
+本项目由 [herouu](https://github.com/herouuu) 独立维护。初始灵感来自 [BrainerVirus/opencode-commandcode](https://github.com/BrainerVirus/opencode-commandcode)（[Brent Weatherall](https://github.com/brent-weatherall) 原始实现），现已完全独立开发。
 
 ## 许可证
 

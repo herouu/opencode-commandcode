@@ -55,7 +55,7 @@ export function meetsModelCountFloor(modelCount: number, lastSuccessful: number 
   return modelCount >= (lastSuccessful === null ? 20 : floor);
 }
 
-export function bestCostCatalog(sources: CostSources): CostCatalogBest {
+function bestCostCatalog(sources: CostSources): CostCatalogBest {
   if (sources.cli > 0) return "cli";
   if (sources.officialDocs > 0) return "docs";
   if (sources.thirdParty > 0) return "thirdParty";
@@ -64,7 +64,7 @@ export function bestCostCatalog(sources: CostSources): CostCatalogBest {
   return "missing";
 }
 
-export function catalogStatus(modelCatalogOk: boolean, sources: CostSources): CatalogStatus {
+function catalogStatus(modelCatalogOk: boolean, sources: CostSources): CatalogStatus {
   if (!modelCatalogOk) return "broken";
   if (sources.unmatched > 0) return "degraded";
   return "healthy";

@@ -43,20 +43,20 @@ export interface SnEntry {
   maxOutputTokens?: number;
 }
 
-export interface ResolvedCommandCodePackage {
+interface ResolvedCommandCodePackage {
   root: string;
   bundlePath: string;
   version: string;
 }
 
-export interface LocalCatalogResult {
+interface LocalCatalogResult {
   models: ModelEntry[];
   version: string;
   root: string;
   bundleSource: string;
 }
 
-export const FALLBACK_LIMITS: Record<string, { context: number; output: number }> = {
+const FALLBACK_LIMITS: Record<string, { context: number; output: number }> = {
   "claude-haiku-4-5-20251001": { context: 200000, output: 8192 },
   "claude-opus-4-6": { context: 200000, output: 32000 },
   "claude-opus-4-7": { context: 200000, output: 32000 },
@@ -81,7 +81,7 @@ export const FALLBACK_LIMITS: Record<string, { context: number; output: number }
   "google/gemini-3.1-flash-lite": { context: 1000000, output: 65536 },
 };
 
-export const HARDCODED_EXTRAS: SnEntry[] = [
+const HARDCODED_EXTRAS: SnEntry[] = [
   {
     id: "Qwen/Qwen3.7-Max",
     provider: "vercel-ai-gateway",
@@ -93,7 +93,7 @@ export const HARDCODED_EXTRAS: SnEntry[] = [
   },
 ];
 
-export const TIER_MAP: Record<string, "premium" | "open-source"> = {
+const TIER_MAP: Record<string, "premium" | "open-source"> = {
   anthropic: "premium",
   openai: "premium",
   baseten: "open-source",
@@ -110,7 +110,7 @@ const COST_ANCHORS = [
 ] as const;
 
 /** Object after `(` (legacy IIFE / enum form): `(Wt={...})` */
-export function findBalancedObject(source: string, anchor: string): string {
+function findBalancedObject(source: string, anchor: string): string {
   const anchorIdx = source.indexOf(anchor);
   if (anchorIdx < 0) throw new Error(`Anchor not found: ${anchor}`);
 
@@ -135,11 +135,7 @@ export function findBalancedObject(source: string, anchor: string): string {
 }
 
 /** All balanced `{...}` spans that contain the anchor, innermost → outermost. */
-export function findEnclosingObjectCandidates(
-  source: string,
-  anchor: string,
-  fromIndex = 0,
-): string[] {
+function findEnclosingObjectCandidates(source: string, anchor: string, fromIndex = 0): string[] {
   const anchorIdx = source.indexOf(anchor, fromIndex);
   if (anchorIdx < 0) throw new Error(`Anchor not found: ${anchor}`);
 
@@ -174,21 +170,14 @@ export function findEnclosingObjectCandidates(
   return out;
 }
 
-/** Default: innermost enclosing object (good for plain catalogs). */
-export function findEnclosingObject(source: string, anchor: string, fromIndex = 0): string {
-  const first = findEnclosingObjectCandidates(source, anchor, fromIndex)[0];
-  if (!first) throw new Error(`Could not find enclosing object for anchor: ${anchor}`);
-  return first;
-}
-
-export function evaluateWithContext(code: string, context: Record<string, unknown>): any {
+function evaluateWithContext(code: string, context: Record<string, unknown>): any {
   const keys = Object.keys(context);
   const values = keys.map((k) => context[k]);
   const fn = Function(...keys, `"use strict"; return (${code})`);
   return fn(...values);
 }
 
-export function normalizeForEval(code: string): string {
+function normalizeForEval(code: string): string {
   return code
     .replace(/!0/g, "true")
     .replace(/!1/g, "false")
@@ -207,7 +196,7 @@ function getVarNameBefore(source: string, anchorIdx: number): string | null {
 }
 
 /** Prefer provider enums that include gateway/openai keys over UI-only enums. */
-export function extractBestProviderEnum(
+function extractBestProviderEnum(
   source: string,
 ): { name: string; value: Record<string, string> } | null {
   const anchor = 'ANTHROPIC:"anthropic"';
@@ -259,7 +248,7 @@ export function extractBestProviderEnum(
 }
 
 /** Collect nearby `name="value"` bindings and simple aliases (`tI=Qx`). */
-export function extractStringBindings(
+function extractStringBindings(
   source: string,
   endIdx: number,
   window = 12000,
@@ -288,7 +277,7 @@ export function extractStringBindings(
   return bindings;
 }
 
-export function extractSpecConstants(source: string): {
+function extractSpecConstants(source: string): {
   chatComplete: string;
   responses: string;
   qt: string;
@@ -353,7 +342,7 @@ function isModelCatalog(value: unknown): value is Record<string, SnEntry> {
   return modelish >= 2;
 }
 
-export function extractModelCatalog(
+function extractModelCatalog(
   source: string,
   wt?: Record<string, string>,
   wtName?: string,
@@ -534,7 +523,7 @@ export function disambiguateModelNames(entries: ModelEntry[]): ModelEntry[] {
   return entries;
 }
 
-export function sortModelEntries(entries: ModelEntry[]): ModelEntry[] {
+function sortModelEntries(entries: ModelEntry[]): ModelEntry[] {
   disambiguateModelNames(entries);
   return entries.sort((a, b) => {
     if (a.tier !== b.tier) return a.tier === "premium" ? -1 : 1;
@@ -729,7 +718,7 @@ export function loadCatalogFromLocalCommandCode(options?: {
   }
 }
 
-export function toConfigKey(id: string): string {
+function toConfigKey(id: string): string {
   const slashIdx = id.indexOf("/");
   const short = slashIdx >= 0 ? id.slice(slashIdx + 1) : id;
   return short.toLowerCase();
