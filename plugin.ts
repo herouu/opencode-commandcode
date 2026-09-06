@@ -225,13 +225,6 @@ export default async function commandcodePlugin() {
         {
           type: "api",
           label: "API Key",
-          authorize: async (inputs: Record<string, unknown> | undefined) => {
-            const rawKey = inputs?.key;
-            if (typeof rawKey !== "string") return { type: "failed" as const };
-            const key = rawKey.trim();
-            if (!key) return { type: "failed" as const };
-            return { type: "api" as const, key };
-          },
         },
       ],
       loader: async (getAuth: () => Promise<{ type: string; key?: string } | null>) => {

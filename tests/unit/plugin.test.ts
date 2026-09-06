@@ -12,9 +12,6 @@ type PluginResult = {
     methods: Array<{
       type: string;
       label: string;
-      authorize: (
-        inputs: Record<string, unknown> | undefined,
-      ) => Promise<{ type: string; key?: string }>;
     }>;
     loader: (
       getAuth: () => Promise<{ type: string; key?: string } | null>,
@@ -78,37 +75,6 @@ afterAll(() => {
 test("plugin returns correct provider name", async () => {
   const plugin = await pluginFn();
   expect(plugin.auth.provider).toBe("commandcode");
-});
-
-test("authorize returns success with valid key", async () => {
-  const plugin = await pluginFn();
-  const result = await plugin.auth.methods[0].authorize({ key: "sk-valid-key" });
-  expect(result.type).toBe("api");
-  expect((result as Record<string, unknown>).key).toBe("sk-valid-key");
-});
-
-test("authorize returns failed with empty key", async () => {
-  const plugin = await pluginFn();
-  const result = await plugin.auth.methods[0].authorize({ key: "   " });
-  expect(result.type).toBe("failed");
-});
-
-test("authorize returns failed with undefined key", async () => {
-  const plugin = await pluginFn();
-  const result = await plugin.auth.methods[0].authorize({ key: undefined });
-  expect(result.type).toBe("failed");
-});
-
-test("authorize returns failed with missing inputs", async () => {
-  const plugin = await pluginFn();
-  const result = await plugin.auth.methods[0].authorize(undefined);
-  expect(result.type).toBe("failed");
-});
-
-test("authorize handles non-string key", async () => {
-  const plugin = await pluginFn();
-  const result = await plugin.auth.methods[0].authorize({ key: 123 as unknown as string });
-  expect(result.type).toBe("failed");
 });
 
 test("loader returns apiKey on successful auth", async () => {
