@@ -83,7 +83,7 @@ test("plugin returns correct provider name", async () => {
 test("authorize returns success with valid key", async () => {
   const plugin = await pluginFn();
   const result = await plugin.auth.methods[0].authorize({ key: "sk-valid-key" });
-  expect(result.type).toBe("success");
+  expect(result.type).toBe("api");
   expect((result as Record<string, unknown>).key).toBe("sk-valid-key");
 });
 

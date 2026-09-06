@@ -230,7 +230,7 @@ export default async function commandcodePlugin() {
             if (typeof rawKey !== "string") return { type: "failed" as const };
             const key = rawKey.trim();
             if (!key) return { type: "failed" as const };
-            return { type: "success" as const, key };
+            return { type: "api" as const, key };
           },
         },
       ],
