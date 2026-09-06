@@ -187,6 +187,17 @@ test("config hook creates provider block if missing", async () => {
   expect(cc.npm).toBe("@ai-sdk/openai-compatible");
 });
 
+test("config hook creates commandcode block when provider exists but empty", async () => {
+  const plugin = await pluginFn();
+  const config: Record<string, unknown> = { provider: {} };
+  await plugin.config(config);
+
+  const cc = (config.provider as Record<string, Record<string, unknown>>).commandcode;
+  expect(cc).toBeDefined();
+  expect(cc.npm).toBe("@ai-sdk/openai-compatible");
+  expect(Object.keys((cc.models as object) ?? {}).length).toBeGreaterThan(0);
+});
+
 test("startup summary uses bundled manifest version and status", async () => {
   const plugin = await pluginFn();
   const config: Record<string, unknown> = { provider: { commandcode: {} } };

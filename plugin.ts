@@ -108,13 +108,11 @@ function readBundledVersion(): string | null {
 export default async function commandcodePlugin() {
   return {
     config: async (config: Record<string, unknown>) => {
-      if (!(config as Record<string, unknown>).provider) {
-        (config as Record<string, unknown>).provider = { commandcode: {} };
-      }
-      const cc = (
-        (config as Record<string, unknown>).provider as Record<string, Record<string, unknown>>
-      )?.commandcode as Record<string, unknown> | undefined;
-      if (!cc) return;
+      const providers = ((config as Record<string, unknown>).provider ??= {}) as Record<
+        string,
+        Record<string, unknown>
+      >;
+      const cc = (providers.commandcode ??= {}) as Record<string, unknown>;
 
       const pluginCfg = loadPluginConfig();
       const debug = pluginCfg.debugStartupLogs === true;
