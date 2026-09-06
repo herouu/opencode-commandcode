@@ -70,6 +70,13 @@ opencode auth login --provider commandcode   # 方式二：交互式（/connect 
 
 ## 工作原理
 
+插件采用 opencode 的 **config hook**：opencode 每次启动时执行插件导出的 `config` 函数，并向其传入待解析的全局配置。插件在 config hook 中完成两件事：
+
+1. **注入 provider 配置**：通过 `??=` 确保 `provider.commandcode` 块存在，并补齐 `npm: "@ai-sdk/openai-compatible"`、name、`COMMANDCODE_API_KEY` env 与默认 `baseURL`，实现安装即用、零手写配置。若用户已显式书写该块，插件不会覆盖已存在字段。
+2. **注入模型目录**：按 `远程 models.json → opt-in 本地包 → 包内静态 → 本地缓存` 顺序加载模型列表，写入 `provider.commandcode.models`。
+
+配合 opencode 的 `auth` hook 声明 API Key 认证方式，`/connect` 与 `opencode auth login --provider commandcode` 可直接完成登录。
+
 ```mermaid
 sequenceDiagram
     autonumber
