@@ -47,8 +47,10 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+      - name: Update npm to support trusted publishing
+        run: npm install -g npm@11
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install --frozen-lockfile
-      - run: npm publish
+      - run: npm publish --access public
