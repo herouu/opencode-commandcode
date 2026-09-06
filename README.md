@@ -24,7 +24,7 @@
 
 ## 演示
 
-[![asciinema 演示](https://asciinema.org/a/1264752.svg)](https://asciinema.org/a/1264752)
+[![asciinema 演示](https://asciinema.org/a/1264752.svg)](https://asciinema.org/a/1264752?speed=2&idleTimeLimit=2)
 
 安装插件 → 重启 opencode → `/models` 中选择 Command Code 模型 → 直接对话。
 
