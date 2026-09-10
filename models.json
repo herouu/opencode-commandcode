@@ -447,9 +447,9 @@
     ],
     "tool_call": true,
     "cost": {
-      "input": 0.22,
-      "output": 0.66,
-      "cache_read": 0.007
+      "input": 0.15,
+      "output": 0.6,
+      "cache_read": 0.003
     },
     "limit": {
       "context": 1000000,
@@ -548,6 +548,37 @@
     "modalities": {
       "input": [
         "text"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v4.1-flash",
+    "name": "DeepSeek V4.1 Flash",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "high",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.15,
+      "output": 0.6,
+      "cache_read": 0.003
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
       ],
       "output": [
         "text"
