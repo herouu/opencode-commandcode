@@ -506,9 +506,9 @@
     ],
     "tool_call": true,
     "cost": {
-      "input": 0.22,
-      "output": 0.66,
-      "cache_read": 0.007
+      "input": 0.15,
+      "output": 0.6,
+      "cache_read": 0.003
     },
     "limit": {
       "context": 1000000,
