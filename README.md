@@ -18,7 +18,7 @@
 | 零配置接入 | 安装后重启 opencode 即可使用，provider 配置与模型列表自动注入 |
 | 单 key 多模型 | 一个 Command Code API key 聚合 70+ 模型（Claude、GPT、Gemini、DeepSeek 等） |
 | 运行时目录同步 | 每次启动拉取最新 `models.json`，上游新模型即时生效 |
-| 离线兜底 | 拉取失败自动回退包内静态目录 → 本地缓存，模型不缺失 |
+| 离线兜底 | 拉取失败自动回退本地缓存 → 包内静态目录；缓存带时间戳，按新鲜度择优 |
 | 目录自同步 | CI 每 6 小时检测上游 `command-code` 新版本并直推 `main` |
 | 安全发布 | 基于 GitHub OIDC Trusted Publishing 发布 npm，无需 long-lived token |
 
@@ -109,9 +109,9 @@ sequenceDiagram
     Note over PLUGIN,OC: 使用线 · 每次启动（用户可见）
     PLUGIN->>REPO: fetch raw models.json（8s 超时）
     alt 拉取成功
-        PLUGIN->>CACHE: 写入缓存
+        PLUGIN->>CACHE: 写入缓存（带 generatedAt 元数据）
     else 拉取失败
-        PLUGIN->>CACHE: 回退 bundled → 缓存
+        PLUGIN->>CACHE: 缓存 vs 包内目录，按新鲜度择优
     end
     CACHE->>PLUGIN: 模型列表
     PLUGIN->>OC: 注入 provider.commandcode.models
@@ -154,7 +154,11 @@ CI 一览：
 ## 常见问题
 
 **模型列表不更新？**
-先确认能访问 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`；再查本机状态 `~/.local/state/opencode/commandcode-provider/startup.json` 里的 `catalogSource` 字段（应为 `remote`）。
+先确认能访问 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`；再查本机状态 `~/.local/state/opencode/commandcode-provider/startup.json`：
+
+- `catalogSource` 应为 `remote`；为 `cache` / `bundled` 表示本次走了兜底（`degraded` 会为 `true`，`degradedReason` 说明原因）。
+- 兜底时**不是**固定优先级：本地缓存与包内静态目录都有时间戳（`catalogGeneratedAt` vs `manifest.generatedAt`），取更新的那一份；旧格式缓存（裸数组、无时间戳）退化为比较模型数量。
+- 只有 `remote` / `opt-in-local` 成功才写缓存，包内目录不会写进缓存，避免把随包冻结的旧目录钉死在缓存里。
 
 **升级插件后模型列表还是旧的 / 行为异常？**
 opencode 将插件缓存于 `~/.cache/opencode/packages/@herouucn/`。删除该目录后重跑 `opencode models` 强制重拉最新版：

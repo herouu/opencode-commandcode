@@ -5,9 +5,11 @@ herouu 独立维护的 `@herouucn/opencode-commandcode`（独立 fork，不再�
 ## 运行时目录加载（`plugin.ts`）
 
 - 每次启动优先拉取 raw GitHub `models.json`（默认 `https://raw.githubusercontent.com/herouu/opencode-commandcode/main/models.json`）。
-- 拉取失败回退 bundled `models.json` → 本地缓存 `catalog-cache.json`。
-- 可用环境变量 `COMMANDCODE_CATALOG_URL`（或配置 `catalogUrl`）覆盖远程 URL；设为 `disabled` 关闭远程拉取。
-- `src/startup.ts` 的 `StartupSummary.catalogSource` 含 `"remote"`。
+- 顺序：`remote` → `opt-in-local`（显式 `commandCodePackagePath`）→ 本地兜底。
+- 本地兜底**不是**固定优先级：`catalog-cache.json` 与包内 `models.json` 都有时间戳时取更新者（`generatedAt` vs `manifest.generatedAt`），旧格式缓存（裸数组、无时间戳）退化为比较模型数量，平手时包内目录优先。
+- 只有 `remote` / `opt-in-local` 成功才写缓存（`src/startup.ts` 的 `writeCatalogCache`），包内目录不写缓存，防止旧目录被钉死在缓存里。
+- 可用环境变量 `COMMANDCODE_CATALOG_URL`（或配置 `catalogUrl`）覆盖远程 URL；设为 `disabled` 关闭远程拉取，此时确定性使用包内目录（缓存仅在包内目录不可读时兜底）。
+- `src/startup.ts` 的 `StartupSummary.catalogSource` 为 `"remote" | "cache" | "opt-in-local" | "bundled"`，并带 `catalogGeneratedAt`。
 
 ## 命令
 
