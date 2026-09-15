@@ -1,5 +1,5 @@
 import { expect, test, beforeAll, afterAll } from "bun:test";
-import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync } from "fs";
+import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -312,5 +312,156 @@ test("CA-05: falls back to last-good cache when bundled catalog unreadable", asy
     if (prev === undefined) delete process.env.COMMANDCODE_PROVIDER_STATE_DIR;
     else process.env.COMMANDCODE_PROVIDER_STATE_DIR = prev;
     rmSync(cacheDir, { recursive: true, force: true });
+  }
+});
+
+function makeModels(count: number): ModelEntry[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `test-model-${i}`,
+    name: `Test Model ${i}`,
+    tier: "open-source" as const,
+    reasoning: false,
+    tool_call: true,
+    cost: { input: 1, output: 2 },
+    limit: { context: 1000, output: 100 },
+  }));
+}
+
+// 指向不可路由的本地端口：让 remote 拉取确定性地失败，不依赖真实网络。
+const UNREACHABLE_CATALOG_URL = "http://127.0.0.1:9/models.json";
+
+async function withCatalogEnv<T>(
+  stateDir: string,
+  catalogUrl: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const prevDir = process.env.COMMANDCODE_PROVIDER_STATE_DIR;
+  const prevUrl = process.env.COMMANDCODE_CATALOG_URL;
+  process.env.COMMANDCODE_PROVIDER_STATE_DIR = stateDir;
+  process.env.COMMANDCODE_CATALOG_URL = catalogUrl;
+  try {
+    return await fn();
+  } finally {
+    if (prevDir === undefined) delete process.env.COMMANDCODE_PROVIDER_STATE_DIR;
+    else process.env.COMMANDCODE_PROVIDER_STATE_DIR = prevDir;
+    if (prevUrl === undefined) delete process.env.COMMANDCODE_CATALOG_URL;
+    else process.env.COMMANDCODE_CATALOG_URL = prevUrl;
+  }
+}
+
+async function runConfig(): Promise<Record<string, unknown>> {
+  const plugin = await pluginFn();
+  const config: Record<string, unknown> = { provider: { commandcode: {} } };
+  await plugin.config(config);
+  return (config.provider as Record<string, Record<string, unknown>>).commandcode;
+}
+
+function readSummary(dir: string): Record<string, unknown> {
+  return JSON.parse(readFileSync(join(dir, "startup.json"), "utf-8")) as Record<string, unknown>;
+}
+
+test("CA-06: prefers newer cache over bundled when remote is unavailable", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-ca06-"));
+  writeCatalogCache(dir, makeModels(2), {
+    source: "remote",
+    generatedAt: "2027-01-01T00:00:00.000Z",
+  });
+  try {
+    await withCatalogEnv(dir, UNREACHABLE_CATALOG_URL, async () => {
+      const cc = await runConfig();
+      expect(Object.keys(cc.models as object).length).toBeGreaterThan(0);
+
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("cache");
+      expect(summary.modelCount).toBe(2);
+      expect(summary.degraded).toBe(true);
+      expect(summary.degradedReason).toContain("last-good cache");
+      expect(summary.catalogGeneratedAt).toBe("2027-01-01T00:00:00.000Z");
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-07: bundled wins over legacy cache with fewer models", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-ca07-"));
+  // 旧格式缓存：裸 ModelEntry[]，无时间戳，模型数量少于包内目录
+  writeFileSync(join(dir, "catalog-cache.json"), JSON.stringify(makeModels(1)), "utf-8");
+  try {
+    await withCatalogEnv(dir, UNREACHABLE_CATALOG_URL, async () => {
+      await runConfig();
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("bundled");
+      expect(summary.modelCount).toBeGreaterThan(20);
+      expect(summary.degraded).toBe(true);
+      expect(summary.degradedReason).toContain("frozen at package version");
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-08: timestamp outranks model count when both are known", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-ca08-"));
+  // 模型更多但时间更旧：包内目录（manifest.generatedAt 更新）应胜出
+  writeCatalogCache(dir, makeModels(99), {
+    source: "remote",
+    generatedAt: "2000-01-01T00:00:00.000Z",
+  });
+  try {
+    await withCatalogEnv(dir, UNREACHABLE_CATALOG_URL, async () => {
+      await runConfig();
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("bundled");
+      expect(summary.modelCount).toBeLessThan(99);
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-09: bundled catalog is never written into the cache", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-ca09-"));
+  try {
+    await withCatalogEnv(dir, "disabled", async () => {
+      await runConfig();
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("bundled");
+      expect(existsSync(join(dir, "catalog-cache.json"))).toBe(false);
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-10: remote success writes cache with freshness metadata", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-ca10-"));
+  const payload = makeModels(3);
+  const server = Bun.serve({
+    port: 0,
+    fetch: () => Response.json(payload),
+  });
+  try {
+    await withCatalogEnv(dir, `http://127.0.0.1:${server.port}/models.json`, async () => {
+      await runConfig();
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("remote");
+      expect(summary.modelCount).toBe(3);
+      expect(summary.degraded).toBe(false);
+
+      const cached = JSON.parse(readFileSync(join(dir, "catalog-cache.json"), "utf-8")) as {
+        source: string;
+        modelCount: number;
+        generatedAt: string;
+        models: ModelEntry[];
+      };
+      expect(cached.source).toBe("remote");
+      expect(cached.modelCount).toBe(3);
+      expect(typeof cached.generatedAt).toBe("string");
+      expect(cached.models.length).toBe(3);
+    });
+  } finally {
+    server.stop(true);
+    rmSync(dir, { recursive: true, force: true });
   }
 });
