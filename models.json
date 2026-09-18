@@ -987,6 +987,37 @@
     }
   },
   {
+    "id": "z-ai/glm-5.3-flashx",
+    "name": "GLM-5.3 FlashX",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "high",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.37,
+      "output": 1.25,
+      "cache_read": 0.075
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 131072
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "gpt-5.6-luna",
     "name": "GPT-5.6 Luna",
     "tier": "open-source",
