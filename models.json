@@ -2129,6 +2129,39 @@
     }
   },
   {
+    "id": "Qwen/Qwen3.8-Omni-Flash",
+    "name": "Qwen 3.8 Omni Flash",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "xhigh"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.15,
+      "output": 0.47,
+      "cache_read": 0.016
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 131072
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "stepfun/Step-3.5-Flash",
     "name": "Step 3.5 Flash",
     "tier": "open-source",
