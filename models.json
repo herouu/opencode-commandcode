@@ -1010,7 +1010,8 @@
     "modalities": {
       "input": [
         "text",
-        "image"
+        "image",
+        "video"
       ],
       "output": [
         "text"
@@ -1449,15 +1450,39 @@
     }
   },
   {
-    "id": "meituan/LongCat-2.0:free",
+    "id": "meituan/LongCat-2.0",
     "name": "LongCat 2.0",
     "tier": "open-source",
     "reasoning": true,
     "tool_call": true,
     "cost": {
+      "input": 0.3,
+      "output": 1.2,
+      "cache_read": 0.006
+    },
+    "limit": {
+      "context": 1048576,
+      "output": 65536
+    },
+    "attachment": false,
+    "modalities": {
+      "input": [
+        "text"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "meituan/LongCat-2.0:free",
+    "name": "LongCat 2.0 (Free)",
+    "tier": "open-source",
+    "reasoning": true,
+    "tool_call": true,
+    "cost": {
       "input": 0,
-      "output": 0,
-      "cache_read": 0
+      "output": 0
     },
     "limit": {
       "context": 1048576,
