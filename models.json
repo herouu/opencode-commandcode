@@ -203,6 +203,41 @@
     }
   },
   {
+    "id": "claude-opus-5-5",
+    "name": "Claude Opus 5.5",
+    "tier": "premium",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 4,
+      "output": 20,
+      "cache_read": 0.2,
+      "cache_write": 5
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "pdf"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "claude-sonnet-4-6",
     "name": "Claude Sonnet 4.6",
     "tier": "premium",
@@ -1211,7 +1246,8 @@
     "modalities": {
       "input": [
         "text",
-        "image"
+        "image",
+        "pdf"
       ],
       "output": [
         "text"
@@ -1603,8 +1639,8 @@
       "input": [
         "text",
         "image",
-        "video",
-        "audio"
+        "audio",
+        "video"
       ],
       "output": [
         "text"
@@ -1631,8 +1667,8 @@
       "input": [
         "text",
         "image",
-        "video",
-        "audio"
+        "audio",
+        "video"
       ],
       "output": [
         "text"
