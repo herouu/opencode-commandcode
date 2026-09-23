@@ -472,6 +472,76 @@
     }
   },
   {
+    "id": "gpt-6-luna",
+    "name": "GPT-6 Luna",
+    "tier": "premium",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_read": 0.01,
+      "cache_write": 0.125
+    },
+    "limit": {
+      "context": 1050000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "pdf"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "gpt-6-sol",
+    "name": "GPT-6 Sol",
+    "tier": "premium",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 2,
+      "output": 10,
+      "cache_read": 0.2,
+      "cache_write": 2.5
+    },
+    "limit": {
+      "context": 1050000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "pdf"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "deepseek/deepseek-v4-flash",
     "name": "DeepSeek V4 Flash (latest)",
     "tier": "open-source",
