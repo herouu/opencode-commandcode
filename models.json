@@ -671,9 +671,9 @@
     ],
     "tool_call": true,
     "cost": {
-      "input": 0.15,
-      "output": 0.6,
-      "cache_read": 0.003
+      "input": 0.3,
+      "output": 1.2,
+      "cache_read": 0.006
     },
     "limit": {
       "context": 1000000,
@@ -1765,8 +1765,8 @@
       "input": [
         "text",
         "image",
-        "video",
-        "audio"
+        "audio",
+        "video"
       ],
       "output": [
         "text"
@@ -2432,6 +2432,38 @@
         "text",
         "image",
         "audio",
+        "video"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "stealth/space-bunny-alpha",
+    "name": "Space Bunny Alpha",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cache_read": 0
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 524288
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
         "video"
       ],
       "output": [
