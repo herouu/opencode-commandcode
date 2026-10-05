@@ -2280,11 +2280,6 @@
     "name": "Pixel Canary",
     "tier": "open-source",
     "reasoning": true,
-    "reasoningEfforts": [
-      "low",
-      "medium",
-      "xhigh"
-    ],
     "tool_call": true,
     "cost": {
       "input": 0.5,
@@ -2292,7 +2287,7 @@
     },
     "limit": {
       "context": 262144,
-      "output": 131072
+      "output": 65536
     },
     "attachment": true,
     "modalities": {
@@ -2608,21 +2603,14 @@
     "name": "Space Bunny Alpha",
     "tier": "open-source",
     "reasoning": true,
-    "reasoningEfforts": [
-      "low",
-      "medium",
-      "high",
-      "max"
-    ],
     "tool_call": true,
     "cost": {
-      "input": 0,
-      "output": 0,
-      "cache_read": 0
+      "input": 0.05,
+      "output": 0.15
     },
     "limit": {
       "context": 1000000,
-      "output": 524288
+      "output": 65536
     },
     "attachment": true,
     "modalities": {
