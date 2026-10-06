@@ -2080,6 +2080,37 @@
     }
   },
   {
+    "id": "mistral/mistral-large-4",
+    "name": "Mistral Large 4",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 1.36,
+      "output": 4.18,
+      "cache_read": 0.14
+    },
+    "limit": {
+      "context": 524288,
+      "output": 262144
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "meta/muse-spark-1.1",
     "name": "Muse Spark 1.1",
     "tier": "open-source",
@@ -2605,8 +2636,8 @@
     "reasoning": true,
     "tool_call": true,
     "cost": {
-      "input": 0.05,
-      "output": 0.15
+      "input": 0.5,
+      "output": 2
     },
     "limit": {
       "context": 1000000,
@@ -2616,8 +2647,7 @@
     "modalities": {
       "input": [
         "text",
-        "image",
-        "video"
+        "image"
       ],
       "output": [
         "text"
