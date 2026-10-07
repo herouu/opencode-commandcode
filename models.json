@@ -98,6 +98,41 @@
     }
   },
   {
+    "id": "claude-haiku-5-5",
+    "name": "Claude Haiku 5.5",
+    "tier": "premium",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_read": 0.01,
+      "cache_write": 0.125
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "pdf"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "claude-opus-4-7",
     "name": "Claude Opus 4.7",
     "tier": "premium",
@@ -1224,6 +1259,37 @@
         "text",
         "image",
         "video"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "stealth/glyph-cluster:free",
+    "name": "Glyph Cluster",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cache_read": 0
+    },
+    "limit": {
+      "context": 256000,
+      "output": 256000
+    },
+    "attachment": false,
+    "modalities": {
+      "input": [
+        "text"
       ],
       "output": [
         "text"
