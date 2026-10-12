@@ -425,7 +425,12 @@ test("CA-07: bundled wins over legacy cache with fewer models", async () => {
       expect(summary.catalogSource).toBe("bundled");
       expect(summary.modelCount).toBeGreaterThan(20);
       expect(summary.degraded).toBe(true);
-      expect(summary.degradedReason).toContain("frozen at package version");
+      // 远程不可用时降级到包内目录；具体原因文案取决于 manifest.status：
+      // healthy → "frozen at package version"，degraded/broken → 覆盖为状态专属原因
+      //（见 core/source.ts bundledStatus 分支）。两者都说明走了 bundled，断言放宽以兼容 CI 更新。
+      expect(summary.degradedReason).toMatch(
+        /frozen at package version|no listed price|marked broken/,
+      );
     });
   } finally {
     rmSync(dir, { recursive: true, force: true });
