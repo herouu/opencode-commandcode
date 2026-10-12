@@ -1,0 +1,7 @@
+# 行尾强制：容器内（Linux）必须 LF。
+# 本仓库 core.autocrlf=true，工作区检出为 CRLF；.sh / Dockerfile 带 CRLF 会让
+# bash 报 `$'\r': command not found`、Docker 解析 Dockerfile 失败。
+# 只写定向规则，禁止 `* text=auto`（会导致全仓库重新规范化、产生巨大无关 diff）。
+*.sh text eol=lf
+Dockerfile text eol=lf
+.devcontainer/* text eol=lf

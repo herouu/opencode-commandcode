@@ -718,10 +718,21 @@ export function loadCatalogFromLocalCommandCode(options?: {
   }
 }
 
+/**
+ * 生成 opencode config 里 provider.commandcode.models 的 key。
+ *
+ * 必须原样返回目录 id（含首段、含大小写、含内部斜杠），与 V2 字面一致：
+ * - V2（ctx.provider.transform）原样列出完整 id（如 `deepseek/deepseek-v4.1-flash`、
+ *   `MiniMaxAI/MiniMax-M3-Free`）；V1 只要与之逐字相同，同一份配置
+ *   （如 oh-my-opencode-slim 的 model 字段 `commandcode/deepseek/deepseek-v4.1-flash`）
+ *   才能在两版通用，不用各写一套。
+ * - V1 解析 ref 是按第一个 `/` 拆出 provider、剩余整段作为 key 原样匹配（v1.18.29 真机实证：
+ *   手写多段 key 后 `opencode models` 正常列出、`run --model` 解析成功），所以多段/大写 key 无需剥段。
+ * - 曾经的「剥首段 + 转小写」会让 `minimax/minimax-m3-free` 与 `MiniMaxAI/MiniMax-M3-Free`
+ *   撞成同一 key（95 → 94），且 V1/V2 引用不一致，已废弃。
+ */
 function toConfigKey(id: string): string {
-  const slashIdx = id.indexOf("/");
-  const short = slashIdx >= 0 ? id.slice(slashIdx + 1) : id;
-  return short.toLowerCase();
+  return id;
 }
 
 export function generateOpencodeModels(entries: ModelEntry[]): Record<string, unknown> {

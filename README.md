@@ -78,6 +78,38 @@ v1 的 `opencode.json` 写法：
 
 重启 opencode 后在 `/models` 中选择 Command Code 模型即可对话。
 
+### 模型引用格式（V1 / V2 通用）
+
+模型引用一律写成 `commandcode/<完整 id>`，**两个大版本格式完全相同**，一份配置（如
+oh-my-opencode-slim、`opencode.json` 的 `model` 字段、`opencode run --model`）无需按版本分叉：
+
+| 场景 | 写法 |
+| --- | --- |
+| deepseek v4.1 flash | `commandcode/deepseek/deepseek-v4.1-flash` |
+| MiniMax M3 Free | `commandcode/MiniMaxAI/MiniMax-M3-Free` |
+
+原因是 `src/catalog.ts` 的 `toConfigKey` 恒等返回目录 id（含首段、含内部斜杠、含大小写），
+V1 注入的 config key 与 V2 的 model id 逐字一致。（历史版本曾在 V1 剥掉首段并转小写，
+导致 V1 写 `commandcode/deepseek-v4.1-flash`、且 `minimax/…` 与 `MiniMaxAI/…` 撞 key——已废弃。）
+
+### V2 下用 `auth login` 录入 API key
+
+opencode v2 的 `auth login` 候选列表来自 **integration 注册表**，插件已按 v2 机制注册
+`commandcode` integration（一个 key 方法 + 一个 `COMMANDCODE_API_KEY` env 方法）：
+
+```bash
+opencode auth login commandcode             # v2：位置参数（/connect 里搜 Command Code）
+opencode auth login --provider commandcode  # v1：flag 形态（见上表入口差异）
+```
+
+- 通过 `auth login` 录入的 key 会存成 **credential，并覆盖插件注入的 `settings.apiKey`
+  模板**（即 credential 优先；没有 credential 时才回落到模板 / 环境变量）。
+- 环境变量方式依然可用；此时 `opencode auth list` 会把 `COMMANDCODE_API_KEY` 显示为
+  `commandcode` 的 **environment** 连接（无需登录）。
+- 注册 integration 后插件会同时把 provider 的 `activation` 固定为 `enabled`（opencode v2
+  的 provider 可用性判定在有同名 integration 时不再走「无 integration」兜底分支），
+  因此未配置任何凭证时 provider 与模型列表仍然可用。
+
 ## 配置
 
 API key 任选一种方式提供：

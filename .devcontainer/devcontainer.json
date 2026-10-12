@@ -1,0 +1,11 @@
+{
+  "name": "opencode-commandcode 回归（opencode V1 + V2）",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "postCreateCommand": "bun install",
+  "remoteUser": "root"
+}

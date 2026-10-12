@@ -1,0 +1,6 @@
+# 构建上下文排除项：防止 Windows 宿主的工作区产物污染 Linux 镜像
+node_modules
+.git
+.playwright-mcp
+.opencode
+dist

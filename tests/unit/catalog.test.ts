@@ -217,12 +217,43 @@ describe("generateOpencodeModels", () => {
         limit: { context: 1048576, output: 64000 },
       },
     ]);
-    const gemini = models["gemini-3.5-flash"] as Record<string, unknown>;
-    const hy4 = models["hy4-preview"] as Record<string, unknown>;
+    // key 原样保留完整 id（含首段），与 V2 字面一致，一份配置两版通用
+    const gemini = models["google/gemini-3.5-flash"] as Record<string, unknown>;
+    const hy4 = models["tencent/hy4-preview"] as Record<string, unknown>;
     expect(gemini.attachment).toBe(true);
     expect(gemini.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
     expect(hy4.attachment).toBe(false);
     expect(hy4.modalities).toEqual({ input: ["text"], output: ["text"] });
+  });
+
+  test("CA-14: key 原样保留完整 id（含首段与大小写），不剥段不转小写", () => {
+    const models = generateOpencodeModels([
+      {
+        id: "deepseek/deepseek-v4.1-flash",
+        name: "DeepSeek V4.1 Flash",
+        tier: "open-source",
+        reasoning: false,
+        tool_call: true,
+        cost: { input: 0.5, output: 2 },
+        limit: { context: 131072, output: 8192 },
+      },
+      {
+        id: "MiniMaxAI/MiniMax-M3-Free",
+        name: "MiniMax M3 Free",
+        tier: "open-source",
+        reasoning: false,
+        tool_call: true,
+        cost: { input: 0, output: 0 },
+        limit: { context: 200000, output: 8192 },
+      },
+    ]);
+    // 不剥首段（deepseek/、MiniMaxAI/ 都保留），不转小写（MiniMaxAI 大小写原样）
+    expect(Object.keys(models).sort()).toEqual([
+      "MiniMaxAI/MiniMax-M3-Free",
+      "deepseek/deepseek-v4.1-flash",
+    ]);
+    // 内部多段 id 也原样成为 key（防回归：任何剥段逻辑都会破坏该形态）
+    expect(models["deepseek/deepseek-v4.1-flash"]).toBeDefined();
   });
 });
 

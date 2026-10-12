@@ -502,31 +502,93 @@ test("CA-10: remote success writes cache with freshness metadata", async () => {
   }
 });
 
-// ── V2 adapter（Plugin.define + ctx.provider.transform）──────────────────────
-// 复现 opencode v2 的 ctx.provider.transform：只在回调里收集 editor.add 的入参。
+// ── V2 adapter（Plugin.define + ctx.provider.transform + ctx.integration.transform）──
+// 复现 opencode v2 的两个 domain editor：只在回调里收集/应用 editor 的写入。
+//   * provider.transform：add 注册 provider 记录，update(id, cb) 原地改该记录；
+//   * integration.transform：method.update({integrationID, method}) 注册认证方法
+//     （会顺带创建同名 integration 记录），update(id, cb) 改 integration 的展示名。
 
 type V2Registration = {
   info: Record<string, unknown>;
   models: Array<Record<string, unknown>>;
 };
 
-type V2Editor = { add: (input: V2Registration) => void };
+type V2ProviderEditor = {
+  add: (input: V2Registration) => void;
+  update: (providerID: string, update: (info: Record<string, unknown>) => void) => void;
+};
+
+type V2MethodRegistration = {
+  integrationID: string;
+  method: Record<string, unknown>;
+};
+
+type V2IntegrationRef = { id: string; name: string };
+
+type V2IntegrationEditor = {
+  method: { update: (input: V2MethodRegistration) => void };
+  update: (integrationID: string, update: (ref: V2IntegrationRef) => void) => void;
+};
 
 async function runV2Setup(): Promise<{
   registration: V2Registration;
+  providerInfo: Record<string, unknown>;
+  methods: V2MethodRegistration[];
+  integrations: Record<string, V2IntegrationRef>;
   cleanup: (() => void) | undefined;
 }> {
   const registrations: V2Registration[] = [];
+  const methods: V2MethodRegistration[] = [];
+  const infos = new Map<string, Record<string, unknown>>();
+  const integrations: Record<string, V2IntegrationRef> = {};
+
   const ctx = {
     provider: {
-      transform: async (callback: (editor: V2Editor) => void) => {
-        callback({ add: (input) => registrations.push(input) });
+      transform: async (callback: (editor: V2ProviderEditor) => void) => {
+        callback({
+          add: (input) => {
+            registrations.push(input);
+            infos.set(String(input.info.id), input.info);
+          },
+          update: (providerID, update) => {
+            const info = infos.get(providerID) ?? { id: providerID };
+            infos.set(providerID, info);
+            update(info);
+          },
+        });
+      },
+    },
+    integration: {
+      transform: async (callback: (editor: V2IntegrationEditor) => void) => {
+        callback({
+          method: {
+            update: (input) => {
+              methods.push(input);
+              // 真实运行时：方法注册会顺带创建 integration，name 默认取 id
+              integrations[input.integrationID] ??= {
+                id: input.integrationID,
+                name: input.integrationID,
+              };
+            },
+          },
+          update: (integrationID, update) => {
+            integrations[integrationID] ??= { id: integrationID, name: integrationID };
+            update(integrations[integrationID] as V2IntegrationRef);
+          },
+        });
       },
     },
   };
   const cleanup = await pluginMod.setup(ctx);
   expect(registrations.length).toBe(1);
-  return { registration: registrations[0] as V2Registration, cleanup: cleanup ?? undefined };
+  const registration = registrations[0] as V2Registration;
+  return {
+    registration,
+    providerInfo: infos.get("commandcode") ?? {},
+    methods,
+    integrations,
+    cleanup: cleanup ?? undefined,
+  };
 }
 
 test("CA-11: V2 setup registers provider info and models via provider.transform", async () => {
@@ -607,6 +669,39 @@ test("CA-12: V2 setup caches remote catalog and writes summary", async () => {
     });
   } finally {
     server.stop(true);
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-13: V2 setup registers commandcode integration with key and env methods", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-v2-auth-"));
+  try {
+    await withCatalogEnv(dir, "disabled", async () => {
+      const { methods, integrations, providerInfo } = await runV2Setup();
+
+      // key 方法：`opencode auth login` 的候选列表会过滤掉只有 env 方法的 integration，
+      // 因此必须有 key 方法才能选到 commandcode（本次改动的核心目的）。
+      const keyMethods = methods.filter(
+        (m) => m.integrationID === "commandcode" && m.method.type === "key",
+      );
+      expect(keyMethods.length).toBe(1);
+      expect(keyMethods[0]?.method.label).toBe("CommandCode API Key");
+
+      // env 方法：COMMANDCODE_API_KEY 命中时算一条 env connection（auth list 显示已连接）
+      const envMethods = methods.filter(
+        (m) => m.integrationID === "commandcode" && m.method.type === "env",
+      );
+      expect(envMethods.length).toBe(1);
+      expect(envMethods[0]?.method.names).toEqual(["COMMANDCODE_API_KEY"]);
+
+      // 注册 integration 后 provider 可用性不能再依赖「无同名 integration」分支，
+      // 必须显式 activation === "enabled"，否则无凭证时整个 provider 不可用。
+      expect(providerInfo.activation).toBe("enabled");
+
+      // integration 展示名（auth 列表 / 选择器标题）
+      expect(integrations.commandcode?.name).toBe("Command Code");
+    });
+  } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
