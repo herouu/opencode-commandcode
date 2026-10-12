@@ -19,9 +19,16 @@ type PluginResult = {
   };
 };
 
-type PluginModule = { default: () => Promise<PluginResult> };
+type PluginModule = {
+  default: {
+    id: string;
+    setup: (context: unknown) => Promise<(() => void) | undefined | void>;
+    server: () => Promise<PluginResult>;
+  };
+};
 
-let pluginFn: PluginModule["default"];
+let pluginMod: PluginModule["default"];
+let pluginFn: PluginModule["default"]["server"];
 let testStateDir: string;
 let prevStateDir: string | undefined;
 let prevCatalogUrl: string | undefined;
@@ -59,8 +66,10 @@ beforeAll(async () => {
   // supply a "remote" catalog and change which source is under test.
   prevCatalogUrl = process.env.COMMANDCODE_CATALOG_URL;
   process.env.COMMANDCODE_CATALOG_URL = "disabled";
-  const mod = await import("../../plugin.ts");
-  pluginFn = mod.default;
+  const mod = (await import("../../plugin/index.js")) as unknown as PluginModule;
+  pluginMod = mod.default;
+  // V1 hook 工厂：从组合薄壳的 server 字段取（对应 opencode v1 的加载路径）。
+  pluginFn = mod.default.server;
 });
 
 afterAll(() => {
@@ -70,6 +79,28 @@ afterAll(() => {
   else process.env.COMMANDCODE_CATALOG_URL = prevCatalogUrl;
   rmSync(testStateDir, { recursive: true, force: true });
   restoreBundledCatalog();
+});
+
+// one-package 双版本组合薄壳：V2 读 id/setup，V1 读 server()。
+test("default export exposes id, setup (V2) and server (V1)", () => {
+  expect(pluginMod.id).toBe("commandcode");
+  expect(typeof pluginMod.setup).toBe("function");
+  expect(typeof pluginMod.server).toBe("function");
+});
+
+// opencode v2 的目录入口链路：先 server.* 再 index.*，plugin/index.ts 不是自动候选，
+// 因此 index.ts（package main）的 default 必须与 plugin/index.ts 的 default 是同一个组合对象。
+test("index.ts default is the same composed shell as plugin/index.ts", async () => {
+  const indexMod = (await import("../../index.ts")) as unknown as {
+    default: PluginModule["default"];
+    createCommandCode: unknown;
+  };
+  expect(indexMod.default).toBe(pluginMod);
+  expect(indexMod.default.id).toBe("commandcode");
+  expect(typeof indexMod.default.setup).toBe("function");
+  expect(typeof indexMod.default.server).toBe("function");
+  // createCommandCode 命名导出保持不变
+  expect(typeof indexMod.createCommandCode).toBe("function");
 });
 
 test("plugin returns correct provider name", async () => {
@@ -458,6 +489,115 @@ test("CA-10: remote success writes cache with freshness metadata", async () => {
       expect(cached.source).toBe("remote");
       expect(cached.modelCount).toBe(3);
       expect(typeof cached.generatedAt).toBe("string");
+      expect(cached.models.length).toBe(3);
+    });
+  } finally {
+    server.stop(true);
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ── V2 adapter（Plugin.define + ctx.provider.transform）──────────────────────
+// 复现 opencode v2 的 ctx.provider.transform：只在回调里收集 editor.add 的入参。
+
+type V2Registration = {
+  info: Record<string, unknown>;
+  models: Array<Record<string, unknown>>;
+};
+
+type V2Editor = { add: (input: V2Registration) => void };
+
+async function runV2Setup(): Promise<{
+  registration: V2Registration;
+  cleanup: (() => void) | undefined;
+}> {
+  const registrations: V2Registration[] = [];
+  const ctx = {
+    provider: {
+      transform: async (callback: (editor: V2Editor) => void) => {
+        callback({ add: (input) => registrations.push(input) });
+      },
+    },
+  };
+  const cleanup = await pluginMod.setup(ctx);
+  expect(registrations.length).toBe(1);
+  return { registration: registrations[0] as V2Registration, cleanup: cleanup ?? undefined };
+}
+
+test("CA-11: V2 setup registers provider info and models via provider.transform", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-v2-"));
+  try {
+    await withCatalogEnv(dir, "disabled", async () => {
+      const { registration, cleanup } = await runV2Setup();
+      const { info, models } = registration;
+
+      expect(info.id).toBe("commandcode");
+      expect(info.name).toBe("Command Code");
+      expect(info.activation).toBe("enabled");
+      expect(info.package).toBe("@opencode/ai/providers/openai-compatible");
+
+      // V2 Provider.Info 没有 env / apiKey 字段：API key 走 settings 的 env 模板。
+      expect(info.env).toBeUndefined();
+      expect(info.apiKey).toBeUndefined();
+      const settings = info.settings as Record<string, unknown>;
+      expect(settings.baseURL).toBe("https://api.commandcode.ai/provider/v1/");
+      expect(settings.provider).toBe("commandcode");
+      expect(settings.apiKey).toBe("{env:COMMANDCODE_API_KEY}");
+
+      expect(models.length).toBeGreaterThan(20);
+      const sample = models[0] as Record<string, unknown>;
+      expect(sample.providerID).toBe("commandcode");
+      expect(Array.isArray(sample.cost)).toBe(true);
+      expect(typeof (sample.capabilities as Record<string, unknown>).tools).toBe("boolean");
+
+      // reasoningEfforts → variants[].settings.reasoningEffort
+      const withVariants = models.filter(
+        (m) => Array.isArray(m.variants) && (m.variants as unknown[]).length > 0,
+      );
+      expect(withVariants.length).toBeGreaterThan(0);
+      const variants = (withVariants[0] as Record<string, unknown>).variants as Array<
+        Record<string, unknown>
+      >;
+      const variant = variants[0] ?? {};
+      const variantSettings = variant.settings as Record<string, unknown>;
+      expect(typeof variant.id).toBe("string");
+      expect(variantSettings.reasoningEffort).toBe(variant.id);
+
+      // setup 的返回值对应 V1 的 dispose：无持久资源，调用不应抛错。
+      expect(typeof cleanup).toBe("function");
+      if (cleanup) cleanup();
+
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("bundled");
+      expect(summary.modelCount).toBe(models.length);
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CA-12: V2 setup caches remote catalog and writes summary", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cc-v2-remote-"));
+  const payload = makeModels(3);
+  const server = Bun.serve({
+    port: 0,
+    fetch: () => Response.json(payload),
+  });
+  try {
+    await withCatalogEnv(dir, `http://127.0.0.1:${server.port}/models.json`, async () => {
+      const { registration } = await runV2Setup();
+      expect(registration.models.length).toBe(3);
+
+      const summary = readSummary(dir);
+      expect(summary.catalogSource).toBe("remote");
+      expect(summary.modelCount).toBe(3);
+      expect(summary.degraded).toBe(false);
+
+      const cached = JSON.parse(readFileSync(join(dir, "catalog-cache.json"), "utf-8")) as {
+        source: string;
+        models: ModelEntry[];
+      };
+      expect(cached.source).toBe("remote");
       expect(cached.models.length).toBe(3);
     });
   } finally {

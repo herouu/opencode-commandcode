@@ -30,7 +30,8 @@
   },
   "files": [
     "index.ts",
-    "plugin.ts",
+    "plugin/",
+    "core/",
     "models.json",
     "manifest.json",
     "_version.txt",
@@ -45,17 +46,26 @@
       "import": "./index.ts"
     },
     "./server": {
-      "import": "./plugin.ts"
+      "import": "./plugin/index.ts"
+    },
+    "./plugin": {
+      "import": "./plugin/index.ts"
+    },
+    "./plugin.v1": {
+      "import": "./plugin/v1.ts"
+    },
+    "./plugin.v2": {
+      "import": "./plugin/v2.ts"
     }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "lint": "oxlint --deny-warnings src scripts plugin.ts index.ts tests",
-    "lint:fix": "oxlint --fix src scripts plugin.ts index.ts tests",
-    "format": "oxfmt src scripts plugin.ts index.ts tests package.json tsconfig.json",
-    "format:check": "oxfmt --check src scripts plugin.ts index.ts tests package.json tsconfig.json",
+    "lint": "oxlint --deny-warnings src scripts core plugin index.ts tests",
+    "lint:fix": "oxlint --fix src scripts core plugin index.ts tests",
+    "format": "oxfmt src scripts core plugin index.ts tests package.json tsconfig.json",
+    "format:check": "oxfmt --check src scripts core plugin index.ts tests package.json tsconfig.json",
     "check": "bun run lint && bun run format:check && bun test tests/unit/ && bun run typecheck",
     "test": "bun test tests/unit/",
     "test:integration": "bun test tests/integration/",
@@ -66,6 +76,7 @@
     "catalog:ci": "bun run scripts/catalog-sync-ci.ts"
   },
   "devDependencies": {
+    "@opencode/plugin": "^2.0.27",
     "@types/node": "^25.9.1",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",

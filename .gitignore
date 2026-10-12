@@ -5,6 +5,8 @@ dist/
 opencode.local.json
 .commandcode/
 .playwright-mcp/
+.opencode/
+play.cast
 
 # workit: SDD working state (never commit)
 docs/*/sdd/

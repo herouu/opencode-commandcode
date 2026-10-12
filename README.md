@@ -47,6 +47,35 @@ opencode plugin @herouucn/opencode-commandcode
 
 本地开发可直接用路径：`"plugin": ["file:///absolute/path/to/opencode-commandcode"]`。
 
+### 版本兼容（opencode v1 / v2 双入口）
+
+本插件是 one-package 双版本，**入口随 opencode 大版本而不同**：
+
+| opencode | 入口 | 说明 |
+|---|---|---|
+| **v2** | 包名或目录 | 组合入口（`plugin/index.ts`），读 `id` / `setup` |
+| **v1**（≥ 1.18.29） | `@herouucn/opencode-commandcode/plugin.v1` | 纯 V1 adapter（对应文件 `plugin/v1.ts`） |
+
+v1 的 `opencode.json` 写法：
+
+```jsonc
+// opencode.json（opencode v1）
+{
+  "plugin": ["@herouucn/opencode-commandcode/plugin.v1"]
+}
+```
+
+本地路径用法（v1）：
+
+```jsonc
+// opencode.json（opencode v1，本地开发）
+{
+  "plugin": ["file:///absolute/path/to/opencode-commandcode/plugin/v1.ts"]
+}
+```
+
+**v1 不要挂目录或包名**（即 `"plugin": ["@herouucn/opencode-commandcode"]`）。原因：v1 的配置挂载路径对含顶层 await 的目录入口求值会崩溃（模型列表为 0），且 v1 运行时不注入 `@opencode/plugin`，所以 v1 必须改用不依赖它的纯 V1 adapter `plugin/v1.ts`。
+
 重启 opencode 后在 `/models` 中选择 Command Code 模型即可对话。
 
 ## 配置
