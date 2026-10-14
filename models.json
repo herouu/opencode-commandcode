@@ -1798,7 +1798,7 @@
     }
   },
   {
-    "id": "inclusionai/ling-3.1-flash:free",
+    "id": "inclusionai/ling-3.1-flash",
     "name": "Ling 3.1 Flash",
     "tier": "open-source",
     "reasoning": true,
@@ -1809,13 +1809,37 @@
     ],
     "tool_call": true,
     "cost": {
-      "input": 0,
-      "output": 0,
-      "cache_read": 0
+      "input": 0.3,
+      "output": 0.9,
+      "cache_read": 0.06
     },
     "limit": {
       "context": 262144,
       "output": 32768
+    },
+    "attachment": false,
+    "modalities": {
+      "input": [
+        "text"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "inclusionai/ling-3.1-flash:free",
+    "name": "Ling 3.1 Flash (Free)",
+    "tier": "open-source",
+    "reasoning": true,
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0
+    },
+    "limit": {
+      "context": 262144,
+      "output": 65536
     },
     "attachment": false,
     "modalities": {
