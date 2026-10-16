@@ -1325,7 +1325,8 @@
       "input": [
         "text",
         "image",
-        "video"
+        "video",
+        "pdf"
       ],
       "output": [
         "text"
@@ -1716,7 +1717,8 @@
     "modalities": {
       "input": [
         "text",
-        "image"
+        "image",
+        "video"
       ],
       "output": [
         "text"
@@ -2315,7 +2317,8 @@
         "text",
         "image",
         "video",
-        "pdf"
+        "pdf",
+        "audio"
       ],
       "output": [
         "text"
@@ -2385,7 +2388,8 @@
         "text",
         "image",
         "video",
-        "pdf"
+        "pdf",
+        "audio"
       ],
       "output": [
         "text"
@@ -2770,7 +2774,8 @@
       "input": [
         "text",
         "image",
-        "video"
+        "video",
+        "pdf"
       ],
       "output": [
         "text"
@@ -2802,7 +2807,8 @@
       "input": [
         "text",
         "image",
-        "video"
+        "video",
+        "pdf"
       ],
       "output": [
         "text"

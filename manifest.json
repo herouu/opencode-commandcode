@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-16T16:21:57.482Z",
+  "generatedAt": "2026-10-16T20:44:20.957Z",
   "pluginVersion": "0.1.12",
-  "commandCodeVersion": "1.83.0",
-  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.83.0.tgz",
+  "commandCodeVersion": "1.84.0",
+  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.84.0.tgz",
   "modelCount": 100,
   "reasoningModelCount": 86,
   "extraction": {
