@@ -647,8 +647,8 @@
     }
   },
   {
-    "id": "stealth/cat-jam:free",
-    "name": "Cat Jam",
+    "id": "reflection/beam:free",
+    "name": "Beam 1.0",
     "tier": "open-source",
     "reasoning": true,
     "reasoningEfforts": [
@@ -801,7 +801,7 @@
   },
   {
     "id": "deepseek/deepseek-v4.1-flash",
-    "name": "DeepSeek V4.1 Flash",
+    "name": "DeepSeek V4.1 Flash (latest)",
     "tier": "open-source",
     "reasoning": true,
     "reasoningEfforts": [
@@ -833,7 +833,7 @@
   },
   {
     "id": "deepseek/deepseek-v4.1-flash-fast",
-    "name": "DeepSeek V4.1 Flash Fast",
+    "name": "DeepSeek V4.1 Flash Fast (latest)",
     "tier": "open-source",
     "reasoning": true,
     "reasoningEfforts": [
@@ -2191,6 +2191,72 @@
     }
   },
   {
+    "id": "minimax/minimax-m3.1-flash",
+    "name": "MiniMax M3.1 Flash",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.15,
+      "output": 0.6,
+      "cache_read": 0.015
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "minimax/minimax-m3.1-flash:free",
+    "name": "MiniMax M3.1 Flash Free",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "video"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "mistral/mistral-large-4",
     "name": "Mistral Large 4",
     "tier": "open-source",
@@ -2422,7 +2488,6 @@
         "text",
         "image",
         "video",
-        "pdf",
         "audio"
       ],
       "output": [

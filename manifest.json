@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-16T20:44:20.957Z",
+  "generatedAt": "2026-10-20T21:25:03.912Z",
   "pluginVersion": "0.1.12",
-  "commandCodeVersion": "1.84.0",
-  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.84.0.tgz",
-  "modelCount": 100,
-  "reasoningModelCount": 86,
+  "commandCodeVersion": "1.85.1",
+  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.85.1.tgz",
+  "modelCount": 102,
+  "reasoningModelCount": 88,
   "extraction": {
     "modelCatalog": "ok",
     "costCatalog": "docs",
@@ -13,9 +13,9 @@
   },
   "costSources": {
     "cli": 0,
-    "officialDocs": 92,
+    "officialDocs": 93,
     "thirdParty": 0,
-    "free": 6,
+    "free": 7,
     "fallback": 0,
     "unmatched": 2
   },
@@ -27,6 +27,7 @@
       "minimax/minimax-m2.7-free",
       "minimax/minimax-m3-free",
       "MiniMaxAI/MiniMax-M3-Free",
+      "minimax/minimax-m3.1-flash:free",
       "tencent/Hy3"
     ],
     "unmatched": [
