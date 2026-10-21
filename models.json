@@ -2589,6 +2589,57 @@
     }
   },
   {
+    "id": "ornith/ornith-1.5-122b",
+    "name": "Ornith 1.5 122B",
+    "tier": "open-source",
+    "reasoning": true,
+    "tool_call": true,
+    "cost": {
+      "input": 0.16,
+      "output": 0.64,
+      "cache_read": 0.02
+    },
+    "limit": {
+      "context": 262144,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "ornith/ornith-1.5-122b:free",
+    "name": "Ornith 1.5 122B Free",
+    "tier": "open-source",
+    "reasoning": true,
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0
+    },
+    "limit": {
+      "context": 262144,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "stealth/pixel-canary",
     "name": "Pixel Canary",
     "tier": "open-source",
