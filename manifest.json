@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-22T21:21:17.179Z",
+  "generatedAt": "2026-10-23T04:05:24.709Z",
   "pluginVersion": "0.1.12",
-  "commandCodeVersion": "1.87.2",
-  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.87.2.tgz",
+  "commandCodeVersion": "1.87.3",
+  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.87.3.tgz",
   "modelCount": 104,
   "reasoningModelCount": 90,
   "extraction": {
@@ -13,14 +13,17 @@
   },
   "costSources": {
     "cli": 0,
-    "officialDocs": 94,
-    "thirdParty": 0,
+    "officialDocs": 92,
+    "thirdParty": 2,
     "free": 8,
     "fallback": 0,
     "unmatched": 2
   },
   "review": {
-    "thirdParty": [],
+    "thirdParty": [
+      "xiaomi/mimo-v2.5",
+      "xiaomi/mimo-v2.5-pro"
+    ],
     "free": [
       "inclusionai/ling-3.1-flash:free",
       "meituan/LongCat-2.0:free",

@@ -1637,7 +1637,8 @@
     "modalities": {
       "input": [
         "text",
-        "image"
+        "image",
+        "video"
       ],
       "output": [
         "text"
@@ -1892,9 +1893,9 @@
     "reasoning": false,
     "tool_call": true,
     "cost": {
-      "input": 0.14,
-      "output": 0.28,
-      "cache_read": 0.0028
+      "input": 0.14812,
+      "output": 0.29624,
+      "cache_read": 0.002962
     },
     "limit": {
       "context": 1000000,
@@ -1920,9 +1921,9 @@
     "reasoning": false,
     "tool_call": true,
     "cost": {
-      "input": 0.435,
-      "output": 0.87,
-      "cache_read": 0.0036
+      "input": 0.46023,
+      "output": 0.92046,
+      "cache_read": 0.003809
     },
     "limit": {
       "context": 1000000,
