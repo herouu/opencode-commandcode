@@ -714,6 +714,42 @@
     }
   },
   {
+    "id": "stealth/crouton-alpha",
+    "name": "Crouton Alpha",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cache_read": 0
+    },
+    "limit": {
+      "context": 1048576,
+      "output": 943718
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image",
+        "video",
+        "pdf",
+        "audio"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "deepseek/deepseek-v4-flash",
     "name": "DeepSeek V4 Flash (latest)",
     "tier": "open-source",
@@ -1817,8 +1853,7 @@
     "modalities": {
       "input": [
         "text",
-        "image",
-        "video"
+        "image"
       ],
       "output": [
         "text"
@@ -1833,8 +1868,7 @@
     "tool_call": true,
     "cost": {
       "input": 0,
-      "output": 0,
-      "cache_read": 0
+      "output": 0
     },
     "limit": {
       "context": 256000,
@@ -1893,6 +1927,65 @@
     "limit": {
       "context": 262144,
       "output": 65536
+    },
+    "attachment": false,
+    "modalities": {
+      "input": [
+        "text"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "inclusionai/ling-3.1-flash-1019",
+    "name": "Ling 3.1 Flash 1019",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.3,
+      "output": 0.9,
+      "cache_read": 0.06
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 262144
+    },
+    "attachment": false,
+    "modalities": {
+      "input": [
+        "text"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
+    "id": "inclusionai/ling-3.1-flash-1019:free",
+    "name": "Ling 3.1 Flash 1019 Free",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0,
+      "output": 0
+    },
+    "limit": {
+      "context": 1000000,
+      "output": 262144
     },
     "attachment": false,
     "modalities": {
@@ -2556,8 +2649,7 @@
       "input": [
         "text",
         "image",
-        "video",
-        "audio"
+        "video"
       ],
       "output": [
         "text"
