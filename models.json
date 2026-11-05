@@ -1853,7 +1853,8 @@
     "modalities": {
       "input": [
         "text",
-        "image"
+        "image",
+        "pdf"
       ],
       "output": [
         "text"
@@ -1862,7 +1863,7 @@
   },
   {
     "id": "poolside/laguna-s-2.1-free",
-    "name": "Laguna S 2.1",
+    "name": "Laguna S 2.1 (Free)",
     "tier": "open-source",
     "reasoning": true,
     "tool_call": true,
