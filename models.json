@@ -935,6 +935,38 @@
     }
   },
   {
+    "id": "deepseek/deepseek-v4.1-flash-ultrafast",
+    "name": "DeepSeek V4.1 Flash Ultrafast",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "off",
+      "low",
+      "high",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 2.4,
+      "output": 9.6,
+      "cache_read": 0.048
+    },
+    "limit": {
+      "context": 1048576,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "sakana/fugu-ultra",
     "name": "Fugu Ultra",
     "tier": "open-source",
