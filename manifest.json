@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-06T22:53:35.355Z",
+  "generatedAt": "2026-11-13T23:23:57.000Z",
   "pluginVersion": "0.1.12",
-  "commandCodeVersion": "1.88.5",
-  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.88.5.tgz",
-  "modelCount": 110,
-  "reasoningModelCount": 96,
+  "commandCodeVersion": "1.89.1",
+  "commandCodeTarball": "https://registry.npmjs.org/command-code/-/command-code-1.89.1.tgz",
+  "modelCount": 114,
+  "reasoningModelCount": 100,
   "extraction": {
     "modelCatalog": "ok",
     "costCatalog": "docs",
@@ -13,11 +13,11 @@
   },
   "costSources": {
     "cli": 0,
-    "officialDocs": 96,
+    "officialDocs": 98,
     "thirdParty": 2,
-    "free": 10,
+    "free": 11,
     "fallback": 0,
-    "unmatched": 2
+    "unmatched": 3
   },
   "review": {
     "thirdParty": [
@@ -25,6 +25,7 @@
       "xiaomi/mimo-v2.5-pro"
     ],
     "free": [
+      "reflection/beam:free",
       "poolside/laguna-s-2.1-free",
       "inclusionai/ling-3.1-flash:free",
       "inclusionai/ling-3.1-flash-1019:free",
@@ -37,6 +38,7 @@
       "tencent/Hy3"
     ],
     "unmatched": [
+      "stealth/crouton-alpha",
       "stealth/pixel-canary",
       "stealth/space-bunny-alpha"
     ]
