@@ -1889,6 +1889,39 @@
     }
   },
   {
+    "id": "thinkingmachines/inkling-2-mini",
+    "name": "Inkling 2 Mini",
+    "tier": "open-source",
+    "reasoning": true,
+    "reasoningEfforts": [
+      "off",
+      "low",
+      "medium",
+      "high",
+      "max"
+    ],
+    "tool_call": true,
+    "cost": {
+      "input": 0.075,
+      "output": 0.3,
+      "cache_read": 0.015
+    },
+    "limit": {
+      "context": 1048576,
+      "output": 65536
+    },
+    "attachment": true,
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    }
+  },
+  {
     "id": "thinkingmachines/inkling-2-small:free",
     "name": "Inkling 2 Small",
     "tier": "open-source",
