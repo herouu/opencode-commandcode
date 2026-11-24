@@ -2372,9 +2372,10 @@
     "reasoning": false,
     "tool_call": true,
     "cost": {
-      "input": 0.46023,
-      "output": 0.92046,
-      "cache_read": 0.003809
+      "input": 0.48,
+      "output": 1.8,
+      "cache_read": 0.096,
+      "cache_write": 0
     },
     "limit": {
       "context": 1000000,
@@ -2804,7 +2805,8 @@
         "text",
         "image",
         "pdf",
-        "video"
+        "video",
+        "audio"
       ],
       "output": [
         "text"
